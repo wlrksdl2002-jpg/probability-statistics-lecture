@@ -48,3 +48,9 @@
 - AI 생성 이미지·영상: 05_이미지/플로우/ (주차 표지 배경 wNN_cover.jpg, 인트로 영상 intro.mp4, Google Flow로 생성)
 - 검수: `powershell -File render.ps1 <pptx> <폴더>` 로 PowerPoint 렌더링 후 확인
 - 같은 작업 흐름이 `lecture-ppt` 스킬로 저장되어 있음 (C:\Users\kim\.claude\skills\lecture-ppt)
+
+## 웹 강의 사이트 (GitHub Pages)
+- 주소: https://wlrksdl2002-jpg.github.io/probability-statistics-lecture/ (main 브랜치 docs/ 폴더)
+- 웹 슬라이드 다시 만들기: 04_제작도구 폴더에서 `node web/build_web.js` → docs/weeks/weekNN.html
+- 퀴즈: docs/quiz.html (문항이 파일 안에 있음), 애니메이션 놀이터: docs/playground.html + docs/assets/miniman*.js
+- 내용을 고친 뒤 PPT(`node build.js`)와 웹(`node web/build_web.js`)을 둘 다 다시 만들고 커밋·푸시하면 사이트에 반영
