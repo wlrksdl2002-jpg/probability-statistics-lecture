@@ -4,7 +4,7 @@ module.exports = {
   title: "조건부확률과 독립",
   slides: [
     {
-      type: "cover",
+      type: "cover", bg: "w05_cover",
       title: "조건부확률과 독립",
       subtitle: "조건이 붙으면 확률이 바뀜",
       image: "w05_갈림길",

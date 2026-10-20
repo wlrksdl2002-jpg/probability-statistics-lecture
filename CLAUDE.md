@@ -45,5 +45,6 @@
 - 내용: 04_제작도구/content/week01.js ~ week10.js (형식은 04_제작도구/SCHEMA.md)
 - 다시 만들기: 04_제작도구 폴더에서 `node build.js` → 03_완성본/확률과통계_1-10주차.pptx
 - 그래프: figs/figs_weekNN.py → 05_이미지/그래프/, 인터넷 비유 그림: fetch_image.py → 05_이미지/인터넷/ (출처 자동 기록)
+- AI 생성 이미지·영상: 05_이미지/플로우/ (주차 표지 배경 wNN_cover.jpg, 인트로 영상 intro.mp4, Google Flow로 생성)
 - 검수: `powershell -File render.ps1 <pptx> <폴더>` 로 PowerPoint 렌더링 후 확인
 - 같은 작업 흐름이 `lecture-ppt` 스킬로 저장되어 있음 (C:\Users\kim\.claude\skills\lecture-ppt)

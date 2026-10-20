@@ -3,7 +3,7 @@ module.exports = {
   week: 1,
   title: "원순열과 중복순열",
   slides: [
-    { type: "cover", title: "원순열과 중복순열", subtitle: "경우의 수 (1) · 교과서 p.10~15", image: "w01_관람차" },
+    { type: "cover", bg: "w01_cover", title: "원순열과 중복순열", subtitle: "경우의 수 (1) · 교과서 p.10~15", image: "w01_관람차" },
     {
       type: "bullets", title: "10주 강의 흐름",
       bullets: [

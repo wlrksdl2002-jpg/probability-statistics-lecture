@@ -4,7 +4,7 @@ module.exports = {
   title: "같은 것이 있는 순열과 중복조합",
   slides: [
     {
-      type: "cover",
+      type: "cover", bg: "w02_cover",
       title: "같은 것이 있는 순열과 중복조합",
       subtitle: "구별되지 않는 것을 세는 방법",
       image: "w02_레고",

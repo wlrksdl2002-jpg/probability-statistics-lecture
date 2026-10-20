@@ -24,7 +24,7 @@ module.exports = {
   title: "이항정리와 파스칼의 삼각형",
   slides: [
     {
-      type: "cover",
+      type: "cover", bg: "w03_cover",
       title: "이항정리와 파스칼의 삼각형",
       subtitle: "(a + b)^{n}의 계수는 조합의 수",
       image: "w03_파스칼",

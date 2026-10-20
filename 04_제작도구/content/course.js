@@ -4,6 +4,8 @@ module.exports = {
   audience: "공과대학 1학년",
   tagline: "경우의 수부터 통계적 추정까지",
   fileName: "확률과통계_1-10주차.pptx",
+  // 강의 시작 인트로 영상 (05_이미지/플로우/)
+  intro: { video: "intro.mp4", poster: "intro_poster.png", ms: 8000, caption: "확률과 통계: 불확실성을 다루는 공학의 언어" },
   // 차례 슬라이드의 색 구분 (to = 해당 구간 마지막 주차)
   parts: [
     { name: "경우의 수", to: 3 },

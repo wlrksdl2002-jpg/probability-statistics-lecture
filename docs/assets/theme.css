@@ -1,0 +1,43 @@
+/* 확률과 통계 웹 강의 공통 테마: 모든 페이지가 이 파일을 불러옴 */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap");
+
+:root {
+  --ink: #26215C;        /* 주 색 (남보라) */
+  --ink-deep: #1B1740;   /* 어두운 배경 */
+  --ink-2: #3A3380;      /* 어두운 카드 */
+  --coral: #FF6B4A;      /* 강조 (어두운 배경 위) */
+  --coral-text: #C7432A; /* 강조 글자 (밝은 배경 위, 대비 확보) */
+  --teal: #2EC4B6;
+  --gold: #FFB627;
+  --bg: #F6F5FB;         /* 밝은 배경 */
+  --tint: #E7E4F6;       /* 밝은 카드 */
+  --text: #2B2A3D;
+  --muted: #5E5C78;
+  --on-dark: #CFCBEF;
+  --line: #A9A3DA;
+  --radius: 20px;
+  --font: "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+  --mono: "JetBrains Mono", Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; word-break: keep-all; }
+a { color: var(--ink); }
+
+/* 상단 내비게이션 (모든 페이지 공통) */
+.site-nav { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding: 12px 20px; background: var(--ink-deep); color: #fff; }
+.site-nav .brand { font-weight: 900; margin-right: auto; color: #fff; text-decoration: none; }
+.site-nav a.nav-link { color: var(--on-dark); text-decoration: none; padding: 6px 12px; border-radius: 999px; font-size: 15px; }
+.site-nav a.nav-link:hover, .site-nav a.nav-link[aria-current="page"] { background: var(--ink-2); color: #fff; }
+
+.btn { font: inherit; font-weight: 700; text-decoration: none; display: inline-block; border: 0; border-radius: 999px; padding: 10px 20px; cursor: pointer; background: var(--ink); color: #fff; }
+.btn.secondary { background: var(--tint); color: var(--ink); }
+.btn.accent { background: var(--coral-text); color: #fff; }
+.btn:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+.card { background: #fff; border-radius: var(--radius); padding: 20px; box-shadow: 0 2px 12px rgba(38, 33, 92, .08); }
+
+@media (max-width: 640px) {
+  .site-nav { padding: 10px 16px; }
+}

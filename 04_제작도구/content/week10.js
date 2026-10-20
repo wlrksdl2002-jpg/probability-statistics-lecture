@@ -26,7 +26,7 @@ module.exports = {
   title: "모평균의 추정과 10주 정리",
   slides: [
     {
-      type: "cover",
+      type: "cover", bg: "w10_cover",
       title: "모평균의 추정",
       subtitle: "표본으로 모평균의 범위를 말하는 방법",
       image: "w10_그물",

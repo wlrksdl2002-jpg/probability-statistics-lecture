@@ -22,7 +22,7 @@ module.exports = {
   title: "모집단과 표본, 표본평균의 분포",
   slides: [
     {
-      type: "cover",
+      type: "cover", bg: "w09_cover",
       title: "모집단과 표본",
       subtitle: "일부만 보고 전체를 아는 방법",
       image: "w09_갈톤보드",

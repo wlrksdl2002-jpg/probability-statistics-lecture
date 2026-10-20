@@ -10,6 +10,7 @@ const { applyTheme } = require("./apply_theme.js");
 const ROOT = path.resolve(__dirname, "..");
 const IMG_WEB = path.join(ROOT, "05_이미지", "인터넷");
 const IMG_FIG = path.join(ROOT, "05_이미지", "그래프");
+const IMG_GEN = path.join(ROOT, "05_이미지", "플로우");
 const OUT_DIR = path.join(ROOT, "03_완성본");
 const COURSE_FILE = path.join(__dirname, "content", "course.js");
 const COURSE = Object.assign(
@@ -467,7 +468,11 @@ function render(pres, s, wk, section) {
   let slide;
   if (t === "cover") {
     slide = addSlide(pres, "COVER", section);
-    if (s.image) {
+    if (s.bg) {
+      slide.addImage({ path: path.join(IMG_GEN, s.bg + ".jpg"), x: 0, y: 0, w: W, h: H, sizing: { type: "cover", w: W, h: H }, altText: s.bg, objectName: anim.tag("fade", "after", 1000) });
+      slide.addImage({ path: path.join(IMG_GEN, "_fade.png"), x: 0, y: 0, w: W, h: H, altText: "fade" });
+      txt(slide, "이미지: Google Flow로 생성", { x: W - 3.2, y: H - 0.42, w: 3.0, h: 0.3, size: 10, color: COL.onDark, align: "right" });
+    } else if (s.image) {
       const file = webImage(s.image);
       usedCredits.add(s.image);
       slide.addImage({ path: file, x: 7.33, y: 0, w: 6.0, h: H, sizing: { type: "cover", w: 6.0, h: H }, altText: s.image, objectName: anim.tag("fade", "after", 900) });
@@ -652,6 +657,15 @@ function courseCover(pres, weeks) {
   txt(s, COURSE.title, { x: 0.9, y: 2.6, w: 8, h: 1.4, size: textWidth(COURSE.title, 60) > 8 ? 44 : 60, bold: true, color: COL.white });
   txt(s, [`${weeks.length}주 강의`, COURSE.tagline].filter(Boolean).join(" · "), { x: 0.9, y: 4.1, w: 8, h: 0.6, size: 22, color: COL.onDark });
 }
+// 강의 시작 인트로 영상: 슬라이드가 열리면 자동 재생
+function introSlide(pres) {
+  const s = addSlide(pres, "COVER", "표지");
+  const anim = new Anim();
+  const poster = fs.readFileSync(path.join(IMG_GEN, COURSE.intro.poster)).toString("base64");
+  s.addMedia({ type: "video", path: path.join(IMG_GEN, COURSE.intro.video), x: 0, y: 0, w: W, h: H, cover: "data:image/png;base64," + poster, objectName: anim.tag("media", "after", COURSE.intro.ms || 8000) });
+  if (COURSE.intro.caption) txt(s, COURSE.intro.caption, { x: 0.6, y: H - 0.9, w: 9, h: 0.5, size: 16, bold: true, color: COL.white });
+  txt(s, "영상: Google Flow로 생성", { x: W - 3.2, y: H - 0.42, w: 3.0, h: 0.3, size: 10, color: COL.onDark, align: "right" });
+}
 function courseToc(pres, weeks) {
   const s = addSlide(pres, "CONTENT", "표지");
   txt(s, "강의 차례", { x: 0.6, y: 0.4, w: 10.5, h: 0.85, size: 30, bold: true, color: COL.ink, valign: "middle" });
@@ -695,6 +709,7 @@ const EFFECTS = {
   fade: { preset: 10, sub: 0, filter: "fade", dur: 500 },
   wipeUp: { preset: 22, sub: 4, filter: "wipe(up)", dur: 800 },
   wipeRight: { preset: 22, sub: 8, filter: "wipe(right)", dur: 800 },
+  media: { dur: 8000 },
 };
 function timingXml(slideXml) {
   const re = /<p:cNvPr id="(\d+)" name="(ANIM\|[^"]*)"/g;
@@ -739,6 +754,12 @@ function timingXml(slideXml) {
       st.effects.forEach((e, ei) => {
         const E = EFFECTS[e.effect];
         const nodeType = ei > 0 ? "withEffect" : si === 0 && g.start === "click" ? "clickEffect" : "afterEffect";
+        if (e.effect === "media") {
+          effs += `<p:par><p:cTn id="${nid()}" presetID="1" presetClass="mediacall" presetSubtype="0" fill="hold" nodeType="${nodeType}"><p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst>`
+            + `<p:cmd type="call" cmd="playFrom(0.0)"><p:cBhvr><p:cTn id="${nid()}" dur="${e.dur}" fill="hold"/><p:tgtEl><p:spTgt spid="${e.id}"/></p:tgtEl></p:cBhvr></p:cmd>`
+            + `</p:childTnLst></p:cTn></p:par>`;
+          return;
+        }
         effs += `<p:par><p:cTn id="${nid()}" presetID="${E.preset}" presetClass="entr" presetSubtype="${E.sub}" fill="hold" grpId="0" nodeType="${nodeType}"><p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst>`
           + `<p:set><p:cBhvr><p:cTn id="${nid()}" dur="1" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid="${e.id}"/></p:tgtEl><p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val="visible"/></p:to></p:set>`
           + `<p:animEffect transition="in" filter="${E.filter}"><p:cBhvr><p:cTn id="${nid()}" dur="${e.dur}"/><p:tgtEl><p:spTgt spid="${e.id}"/></p:tgtEl></p:cBhvr></p:animEffect>`
@@ -753,6 +774,7 @@ function timingXml(slideXml) {
     + `<p:seq concurrent="1" nextAc="seek"><p:cTn id="2" dur="indefinite" nodeType="mainSeq"><p:childTnLst>${body}</p:childTnLst></p:cTn>`
     + `<p:prevCondLst><p:cond evt="onPrev" delay="0"><p:tgtEl><p:sldTgt/></p:tgtEl></p:cond></p:prevCondLst>`
     + `<p:nextCondLst><p:cond evt="onNext" delay="0"><p:tgtEl><p:sldTgt/></p:tgtEl></p:cond></p:nextCondLst></p:seq>`
+    + items.filter((e) => e.effect === "media").map((e) => `<p:video><p:cMediaNode vol="80000"><p:cTn id="${nid()}" fill="hold" display="0"><p:stCondLst><p:cond delay="indefinite"/></p:stCondLst></p:cTn><p:tgtEl><p:spTgt spid="${e.id}"/></p:tgtEl></p:cMediaNode></p:video>`).join("")
     + `</p:childTnLst></p:cTn></p:par></p:tnLst>${bld ? `<p:bldLst>${bld}</p:bldLst>` : ""}</p:timing>`;
   // 선택 창에 보이는 도형 이름을 읽기 쉽게 정리
   let xml = slideXml;
@@ -797,6 +819,7 @@ async function main() {
 
   pres.addSection({ title: "표지" });
   courseCover(pres, weeks);
+  if (COURSE.intro) introSlide(pres);
   courseToc(pres, weeks);
   for (const wk of weeks) {
     const section = `${wk.week}주차 ${wk.title}`;

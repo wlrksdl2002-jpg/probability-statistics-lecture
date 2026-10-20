@@ -30,7 +30,7 @@ module.exports = {
   title: "연속확률변수와 정규분포",
   slides: [
     {
-      type: "cover",
+      type: "cover", bg: "w08_cover",
       title: "연속확률변수와 정규분포",
       subtitle: "측정값이 종 모양으로 모이는 이유",
       image: "w08_과녁",

@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>6주차 확률변수와 기댓값 · 확률과 통계</title>
+<link rel="stylesheet" href="../assets/theme.css">
+<style>/* 웹 슬라이드 덱: 1600×900 무대를 화면 크기에 맞춰 확대·축소 */
+body.deck-page { height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; background: #14112E; }
+.viewport { flex: 1; position: relative; overflow: hidden; }
+.stage { position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; transform-origin: center; transform: translate(-50%, -50%); }
+.slide { position: absolute; inset: 0; display: none; flex-direction: column; padding: 56px 80px 60px; background: var(--bg); color: var(--text); overflow: hidden; }
+.slide.current { display: flex; }
+.slide.dark { background: var(--ink); color: #F6F5FB; }
+:fullscreen .site-nav, body.presenting .site-nav { display: none; }
+
+/* 컨트롤 바 */
+.controls { display: flex; gap: 6px; align-items: center; justify-content: center; padding: 6px; background: var(--ink-deep); color: var(--on-dark); font-size: 15px; }
+.cbtn { font: inherit; background: transparent; color: var(--on-dark); border: 1px solid var(--ink-2); border-radius: 999px; min-width: 40px; height: 34px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+.cbtn:hover { background: var(--ink-2); color: #fff; }
+.cbtn[aria-disabled="true"] { opacity: .3; pointer-events: none; }
+#counter { min-width: 80px; text-align: center; font-variant-numeric: tabular-nums; }
+.progress { height: 4px; background: var(--ink-deep); }
+#bar { height: 100%; width: 0; background: var(--coral); transition: width .3s; }
+
+/* 공통 글자 */
+.sh { display: flex; align-items: center; gap: 24px; min-height: 76px; }
+.sh h2 { margin: 0; font-size: 46px; font-weight: 900; color: var(--ink); line-height: 1.15; flex: 1; }
+.chip { background: var(--tint); color: var(--ink); font-weight: 700; font-size: 20px; padding: 6px 18px; border-radius: 999px; white-space: nowrap; }
+sub, sup { font-size: .68em; line-height: 0; }
+b { color: var(--coral-text); }
+.dark b { color: var(--gold); }
+
+/* 등장 효과: 자동(.anim) / 단계(.frag) */
+.anim { opacity: 0; transition: opacity .5s ease var(--d, 0s), transform .6s cubic-bezier(.2, .8, .2, 1) var(--d, 0s); }
+.anim.up { transform: translateY(24px); }
+.anim.pop { transform: scale(.6); transform-box: fill-box; transform-origin: center; }
+.slide.active .anim { opacity: 1; transform: none; }
+.frag { opacity: 0; transform: translateY(16px); transition: opacity .45s ease, transform .45s ease; }
+.frag.on { opacity: 1; transform: none; }
+.bar { transform: scaleY(0); transform-box: fill-box; transform-origin: bottom; transition: transform .7s cubic-bezier(.2, .8, .2, 1) var(--d, 0s); fill: var(--ink); }
+.bar.hl { fill: #E8553A; }
+.slide.active .bar { transform: scaleY(1); }
+.reveal { clip-path: inset(0 100% 0 0); transition: clip-path 1.4s ease var(--d, 0s); }
+.slide.active .reveal { clip-path: inset(0 0 0 0); }
+.draw { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset .45s ease var(--d, 0s); }
+.slide.active .draw { stroke-dashoffset: 0; }
+
+/* 차트·도식 */
+.vis { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.chart, .diagram { width: 100%; height: 100%; max-height: 640px; }
+.gl { stroke: #DDDBEA; stroke-width: 1; } .ax { stroke: #A9A3DA; stroke-width: 2; }
+.tk { font-size: 17px; fill: var(--muted); } .at { font-size: 18px; fill: var(--muted); }
+.ct { font-size: 20px; font-weight: 700; fill: var(--ink); } .vl { font-size: 16px; font-weight: 700; fill: var(--text); }
+.edge { stroke: #A9A3DA; stroke-width: 2.5; }
+.nd { fill: var(--tint); } .nd.root { fill: var(--ink); }
+.ndt { font-size: 18px; font-weight: 700; fill: var(--ink); } .ndt.root { fill: #fff; }
+.prob { font-size: 15px; font-weight: 700; fill: var(--coral-text); } .res { font-size: 16px; fill: var(--text); }
+.gridl { stroke: #B9B4E3; stroke-width: 2; } .pt { fill: var(--ink); } .ptl { font-size: 24px; font-weight: 700; fill: var(--ink); }
+.route { stroke: #E8553A; stroke-width: 8; stroke-linecap: round; }
+.pc { fill: var(--tint); } .pc.hl { fill: #E8553A; } .pct { font-weight: 700; fill: var(--ink); } .pct.hl { fill: #fff; }
+.table { fill: #F0EEFA; stroke: #A9A3DA; stroke-width: 3; }
+.seat { fill: var(--ink); } .seat.first { fill: #E8553A; } .seatt { font-size: 19px; font-weight: 700; fill: #fff; }
+.slots { display: flex; align-items: flex-start; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.slotc { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.slot { width: 104px; height: 104px; border: 3px solid var(--ink); border-radius: 14px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 900; color: var(--coral-text); text-align: center; line-height: 1.1; padding: 4px; }
+.slot.gap { border: 0; background: none; color: var(--muted); }
+.slotl { font-size: 17px; color: var(--muted); text-align: center; max-width: 120px; }
+.op { font-size: 30px; font-weight: 700; color: var(--ink); align-self: flex-start; margin-top: 32px; }
+.formula { background: var(--tint); border-radius: 24px; padding: 40px 48px; text-align: center; max-width: 100%; }
+.f-main { font-size: 46px; font-weight: 900; color: var(--ink); }
+.f-note { font-size: 22px; color: var(--muted); margin-top: 16px; }
+.tbl { border-collapse: collapse; font-size: 27px; background: #fff; border-radius: 12px; overflow: hidden; }
+.tbl th { background: var(--ink); color: #fff; padding: 14px 22px; }
+.tbl td { padding: 12px 22px; text-align: center; border-top: 1px solid #DDDBEA; }
+.tbl tbody tr:nth-child(even) td { background: #F6F5FC; }
+figure { margin: 0; }
+.img { max-width: 100%; max-height: 100%; display: flex; flex-direction: column; align-items: center; }
+.img img { max-width: 100%; max-height: 600px; object-fit: contain; border-radius: 12px; }
+figcaption { font-size: 15px; color: var(--muted); margin-top: 6px; text-align: center; }
+.steps { display: grid; gap: 14px; width: 100%; height: 100%; align-content: center; }
+.steps.n2 { grid-template-columns: 1fr 1fr; } .steps.n3 { grid-template-columns: repeat(3, 1fr); } .steps.n4 { grid-template-columns: 1fr 1fr; }
+.steps figure { display: flex; flex-direction: column; align-items: center; min-height: 0; }
+.steps img { max-width: 100%; max-height: 300px; object-fit: contain; }
+.steps.n2 img, .steps.n3 img { max-height: 560px; }
+.steps figcaption { font-size: 20px; font-weight: 700; color: var(--ink); }
+
+/* 레이아웃 */
+.two { flex: 1; display: flex; gap: 48px; margin-top: 24px; min-height: 0; }
+.col-t { flex: 1 1 0; display: flex; flex-direction: column; justify-content: center; gap: 22px; min-width: 0; }
+.col-v { flex: 1.15 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; }
+.one { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 18px; padding: 0 60px; }
+.one.narrow { padding: 0 180px; }
+.bl { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 22px; }
+.bl li { position: relative; padding-left: 34px; font-size: 29px; line-height: 1.45; }
+.bl li::before { content: ""; position: absolute; left: 4px; top: .55em; width: 13px; height: 13px; border-radius: 50%; background: var(--coral); }
+.bl.big li { font-size: 34px; }
+.term { background: var(--ink); color: #fff; border-radius: 20px; padding: 28px 32px; }
+.term-h { font-size: 32px; font-weight: 900; color: var(--gold); margin-bottom: 8px; }
+.term p { margin: 0; font-size: 27px; line-height: 1.55; }
+.term b { color: var(--gold); }
+.fbox { background: var(--tint); border-radius: 20px; padding: 22px; font-size: 31px; font-weight: 900; color: var(--ink); text-align: center; }
+.note { font-size: 24px; color: var(--muted); margin: 0; }
+.tag { align-self: flex-start; font-size: 18px; font-weight: 700; padding: 4px 16px; border-radius: 999px; }
+.tag.tb { background: var(--teal); color: #14112E; } .tag.eng { background: var(--coral-text); color: #fff; }
+.prob { background: var(--tint); border-radius: 18px; padding: 20px 26px; font-size: 28px; font-weight: 700; color: var(--ink); line-height: 1.5; }
+.stp { margin: 0; padding: 0; list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: 12px; }
+.stp li { counter-increment: s; position: relative; padding-left: 50px; font-size: 27px; line-height: 1.5; }
+.stp li::before { content: counter(s); position: absolute; left: 0; top: 4px; width: 36px; height: 36px; border-radius: 50%; background: var(--ink); color: #fff; font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.ans { background: var(--coral-text); color: #fff; border-radius: 16px; padding: 16px 26px; font-size: 32px; font-weight: 900; }
+.ans b { color: #fff; }
+.big { flex: 1; min-height: 0; margin-top: 16px; display: flex; }
+.cap { margin: 14px 0 0; background: #fff; border-radius: 14px; padding: 12px 22px; font-size: 25px; color: var(--ink); }
+.cmps { flex: 1; display: flex; gap: 32px; margin-top: 28px; align-items: center; }
+.cmp { flex: 1; border-radius: 24px; padding: 36px 40px; background: var(--tint); min-height: 380px; }
+.cmp.r { background: #fff; border: 3px solid var(--coral); }
+.cmp h3 { margin: 0 0 22px; font-size: 36px; color: var(--ink); } .cmp.r h3 { color: var(--coral-text); }
+.cmp ul { margin: 0; padding-left: 30px; display: flex; flex-direction: column; gap: 18px; font-size: 30px; line-height: 1.45; }
+.stats { flex: 1; display: flex; gap: 28px; align-items: center; margin-top: 24px; }
+.stat { flex: 1; background: var(--tint); border-radius: 24px; padding: 48px 28px; text-align: center; }
+.sv { font-size: 62px; font-weight: 900; color: var(--coral-text); line-height: 1.1; }
+.sl { font-size: 26px; margin-top: 16px; color: var(--ink); }
+.quiz { flex: 1; display: flex; flex-direction: column; gap: 18px; margin-top: 20px; }
+.qrow { flex: 1; display: flex; gap: 24px; align-items: center; background: #fff; border-radius: 18px; padding: 16px 28px; }
+.qn { flex: none; width: 58px; height: 58px; border-radius: 50%; background: var(--ink); color: #fff; font-weight: 900; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+.qq { margin: 0; font-size: 29px; font-weight: 700; color: var(--ink); } .qa { margin: 8px 0 0; font-size: 28px; font-weight: 700; color: var(--coral-text); }
+
+/* 표지·소단원·정리(어두운 슬라이드) */
+.s-cover { padding: 0; }
+.s-cover .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.s-cover .fade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(27, 23, 64, .97) 0%, rgba(27, 23, 64, .88) 36%, rgba(27, 23, 64, 0) 66%); }
+.cover-txt { position: relative; padding: 110px 90px; max-width: 760px; }
+.num { font-size: 150px; font-weight: 900; color: var(--coral); line-height: 1; }
+.eyebrow { font-size: 24px; font-weight: 700; color: var(--gold); margin: 10px 0 6px; }
+.cover-txt h1, .sec-txt h1 { font-size: 66px; font-weight: 900; line-height: 1.18; margin: 0; }
+.sub { font-size: 26px; color: var(--on-dark); margin: 22px 0 0; }
+.course { font-size: 18px; color: var(--on-dark); margin-top: 70px; }
+.gen { position: absolute; right: 28px; bottom: 16px; font-size: 15px; color: var(--on-dark); margin: 0; }
+.s-section, .s-summary { justify-content: center; }
+.deco { position: absolute; border-radius: 50%; }
+.deco.a { width: 520px; height: 520px; right: 60px; top: 140px; background: var(--ink-2); }
+.deco.b { width: 230px; height: 230px; right: 140px; top: 560px; background: var(--coral); }
+.sec-txt { position: relative; max-width: 900px; }
+.sum-h { font-size: 56px; font-weight: 900; margin: 0 0 32px; }
+.sums { display: flex; gap: 24px; }
+.sum { flex: 1; background: var(--ink-2); border-radius: 22px; padding: 36px 32px; min-height: 300px; }
+.sum h3 { margin: 0 0 14px; color: var(--gold); font-size: 34px; }
+.sum p { margin: 0; font-size: 27px; line-height: 1.55; }
+.next { margin-top: 44px; font-size: 28px; font-weight: 700; color: #FF8A6E; }
+.s-metaphor { flex-direction: row; padding: 0; }
+.mimg { width: 46%; position: relative; }
+.mimg img { width: 100%; height: 100%; object-fit: cover; }
+.mimg figcaption { position: absolute; left: 16px; bottom: 14px; margin: 0; background: rgba(20, 17, 46, .72); color: #fff; padding: 4px 10px; border-radius: 6px; }
+.mtxt { flex: 1; padding: 80px 70px; display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+.mtxt h2 { margin: 0; font-size: 46px; font-weight: 900; color: var(--ink); line-height: 1.2; }
+.pill { align-self: flex-start; background: var(--gold); color: var(--ink); font-weight: 700; padding: 4px 18px; border-radius: 999px; font-size: 18px; }
+.s-intro { padding: 0; background: #14112E; }
+.bgv { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.vfade { position: absolute; left: 0; right: 0; bottom: 0; height: 300px; background: linear-gradient(180deg, rgba(20, 17, 46, 0), rgba(20, 17, 46, .9)); }
+.vcap { position: absolute; left: 80px; bottom: 70px; margin: 0; font-size: 40px; font-weight: 900; }
+.credits { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.credits .tbl { font-size: 19px; }
+.credits .tbl td { text-align: left; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim, .frag, .bar, .reveal, .draw, #bar { transition: none !important; }
+}
+</style>
+</head>
+<body class="deck-page">
+<nav class="site-nav"><a class="brand" href="../index.html">확률과 통계</a><a class="nav-link" href="../index.html">강의 목록</a><a class="nav-link" href="../quiz.html">퀴즈</a><a class="nav-link" href="../playground.html">애니메이션 놀이터</a></nav>
+<main class="viewport" aria-label="6주차 슬라이드">
+<div class="stage" id="stage">
+<section class="slide s-cover dark" data-steps="0" aria-roledescription="slide"><img class="bg" src="../img/cover/w06_cover.jpg" alt=""><div class="fade"></div><div class="cover-txt"><div class="num anim" style="--d:0.10s">06</div><div class="eyebrow">6주차</div><h1>확률변수와 기댓값</h1><p class="sub">불확실한 결과를 숫자로 요약</p><p class="course">확률과 통계 · 공과대학 1학년</p></div><p class="gen">이미지: Google Flow로 생성</p></section>
+<section class="slide s-goals" data-steps="0" aria-roledescription="slide"><header class="sh"><h2>학습목표</h2><span class="chip">6주차</span></header><div class="cards"><div class="goal anim up" style="--d:0.10s"><span class="gn">1</span><p>확률변수와 확률분포의 뜻</p></div><div class="goal anim up" style="--d:0.35s"><span class="gn">2</span><p>기댓값·분산·표준편차의 계산</p></div><div class="goal anim up" style="--d:0.60s"><span class="gn">3</span><p>aX + b의 평균과 분산 활용</p></div></div></section>
+<section class="slide s-section dark" data-steps="0" aria-roledescription="slide"><div class="deco a"></div><div class="deco b anim pop" style="--d:0.20s"></div><div class="sec-txt"><div class="eyebrow">6주차 · 확률변수와 기댓값</div><h1>확률변수와 확률분포</h1><p class="sub">결과를 숫자로 바꾸기</p></div></section>
+<section class="slide s-bullets" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>확률변수란</h2><span class="chip">6주차</span></header><div class="two"><div class="col-t"><ul class="bl "><li class="frag" data-f="1"><b>확률변수(random variable)</b>: 시행 결과마다 수 하나를 대응시킨 변수</li><li class="frag" data-f="2">동전 2개 던지기 → 앞면의 개수 X = 0, 1, 2</li><li class="frag" data-f="3"><b>이산확률변수</b>: 값이 하나하나 셀 수 있게 떨어져 있는 확률변수</li><li class="frag" data-f="4">공학 예: 하루 고장 건수, 불량품 수, 접속 오류 횟수</li></ul></div><div class="col-v"><div class="vis"><table class="tbl anim up" style="--d:0.10s"><thead><tr><th>결과</th><th>앞앞</th><th>앞뒤</th><th>뒤앞</th><th>뒤뒤</th></tr></thead><tbody><tr><td>X (앞면 수)</td><td>2</td><td>1</td><td>1</td><td>0</td></tr></tbody></table></div></div></div></section>
+<section class="slide s-concept" data-steps="2" aria-roledescription="slide"><header class="sh"><h2>확률분포</h2><span class="chip">6주차</span></header><div class="two"><div class="col-t"><div class="term" class="frag" data-f="1"><div class="term-h">확률분포(probability distribution)</div><p>확률변수의 각 값과 그 값을 가질 확률 사이의 대응 관계</p></div><div class="fbox" class="frag" data-f="2">P(X = x<sub>i</sub>) = p<sub>i</sub>   (i = 1, 2, …, n)</div><p class="note" class="frag" data-f="2">0 ≤ p<sub>i</sub> ≤ 1,  p<sub>1</sub> + p<sub>2</sub> + … + p<sub>n</sub> = 1</p></div><div class="col-v"><div class="vis"><svg class="chart" viewBox="0 0 720 460" role="img" aria-label="동전 2개: 앞면의 개수 X"><line x1="70" x2="700" y1="390" y2="390" class="gl"/><text x="60" y="396" class="tk" text-anchor="end">0</text><line x1="70" x2="700" y1="322" y2="322" class="gl"/><text x="60" y="328" class="tk" text-anchor="end">0.1</text><line x1="70" x2="700" y1="254" y2="254" class="gl"/><text x="60" y="260" class="tk" text-anchor="end">0.2</text><line x1="70" x2="700" y1="185.99999999999997" y2="185.99999999999997" class="gl"/><text x="60" y="191.99999999999997" class="tk" text-anchor="end">0.3</text><line x1="70" x2="700" y1="117.99999999999999" y2="117.99999999999999" class="gl"/><text x="60" y="123.99999999999999" class="tk" text-anchor="end">0.4</text><line x1="70" x2="700" y1="50" y2="50" class="gl"/><text x="60" y="56" class="tk" text-anchor="end">0.5</text><line x1="70" x2="700" y1="390" y2="390" class="ax"/><text x="385" y="452" class="at" text-anchor="middle">X</text><text transform="translate(18 220) rotate(-90)" class="at" text-anchor="middle">P(X = x)</text><text x="360" y="26" class="ct" text-anchor="middle">동전 2개: 앞면의 개수 X</text><rect class="bar" x="109.9" y="220" width="130.2" height="170" rx="3" style="--d:0.15s"/><text x="175" y="212" class="vl anim" text-anchor="middle" style="--d:0.60s">0.25</text><text x="175" y="416" class="tk" text-anchor="middle">0</text><rect class="bar" x="319.9" y="50" width="130.2" height="340" rx="3" style="--d:0.42s"/><text x="385" y="42" class="vl anim" text-anchor="middle" style="--d:0.87s">0.50</text><text x="385" y="416" class="tk" text-anchor="middle">1</text><rect class="bar" x="529.9" y="220" width="130.2" height="170" rx="3" style="--d:0.68s"/><text x="595" y="212" class="vl anim" text-anchor="middle" style="--d:1.13s">0.25</text><text x="595" y="416" class="tk" text-anchor="middle">2</text></svg></div></div></div></section>
+<section class="slide s-example" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>꺼낸 부품 중 불량품 개수</h2><span class="chip">6주차</span></header><div class="two"><div class="col-t"><span class="tag eng">공학 예제</span><div class="prob">불량품 3개가 섞인 부품 10개에서 2개를 동시에 꺼낼 때, 불량품 개수 X의 확률분포</div><ol class="stp"><li class="frag" data-f="1">P(X = 0) = <sub>7</sub>C<sub>2</sub> / <sub>10</sub>C<sub>2</sub> = 21/45</li><li class="frag" data-f="2">P(X = 1) = <sub>3</sub>C<sub>1</sub> × <sub>7</sub>C<sub>1</sub> / <sub>10</sub>C<sub>2</sub> = 21/45</li><li class="frag" data-f="3">P(X = 2) = <sub>3</sub>C<sub>2</sub> / <sub>10</sub>C<sub>2</sub> = 3/45</li></ol><div class="ans" class="frag" data-f="4">답 확률의 합 = 45/45 = 1 확인</div></div><div class="col-v"><div class="vis"><svg class="chart" viewBox="0 0 720 460" role="img" aria-label="불량품 개수 X의 확률분포"><line x1="70" x2="700" y1="390" y2="390" class="gl"/><text x="60" y="396" class="tk" text-anchor="end">0</text><line x1="70" x2="700" y1="322" y2="322" class="gl"/><text x="60" y="328" class="tk" text-anchor="end">0.1</text><line x1="70" x2="700" y1="254" y2="254" class="gl"/><text x="60" y="260" class="tk" text-anchor="end">0.2</text><line x1="70" x2="700" y1="185.99999999999997" y2="185.99999999999997" class="gl"/><text x="60" y="191.99999999999997" class="tk" text-anchor="end">0.3</text><line x1="70" x2="700" y1="117.99999999999999" y2="117.99999999999999" class="gl"/><text x="60" y="123.99999999999999" class="tk" text-anchor="end">0.4</text><line x1="70" x2="700" y1="50" y2="50" class="gl"/><text x="60" y="56" class="tk" text-anchor="end">0.5</text><line x1="70" x2="700" y1="390" y2="390" class="ax"/><text x="385" y="452" class="at" text-anchor="middle">X</text><text x="360" y="26" class="ct" text-anchor="middle">불량품 개수 X의 확률분포</text><rect class="bar" x="109.9" y="72.44" width="130.2" height="317.56" rx="3" style="--d:0.15s"/><text x="175" y="64.44" class="vl anim" text-anchor="middle" style="--d:0.60s">0.467</text><text x="175" y="416" class="tk" text-anchor="middle">0</text><rect class="bar" x="319.9" y="72.44" width="130.2" height="317.56" rx="3" style="--d:0.42s"/><text x="385" y="64.44" class="vl anim" text-anchor="middle" style="--d:0.87s">0.467</text><text x="385" y="416" class="tk" text-anchor="middle">1</text><rect class="bar" x="529.9" y="344.44" width="130.2" height="45.56" rx="3" style="--d:0.68s"/><text x="595" y="336.44" class="vl anim" text-anchor="middle" style="--d:1.13s">0.067</text><text x="595" y="416" class="tk" text-anchor="middle">2</text></svg></div></div></div></section>
+<section class="slide s-section dark" data-steps="0" aria-roledescription="slide"><div class="deco a"></div><div class="deco b anim pop" style="--d:0.20s"></div><div class="sec-txt"><div class="eyebrow">6주차 · 확률변수와 기댓값</div><h1>기댓값</h1><p class="sub">분포의 중심</p></div></section>
+<section class="slide s-metaphor" data-steps="3" aria-roledescription="slide"><figure class="mimg"><img src="../img/web/w06_%EC%8B%9C%EC%86%8C.jpg" alt="기댓값 = 분포의 무게중심"><figcaption>사진: Killarnee / CC BY-SA 4.0 / Wikimedia Commons</figcaption></figure><div class="mtxt"><span class="pill">비유</span><h2>기댓값 = 분포의 무게중심</h2><ul class="bl "><li class="frag" data-f="1">확률을 무게로 보면 시소가 균형을 이루는 받침점의 위치</li><li class="frag" data-f="2">자주 나오는 값 쪽으로 받침점이 이동</li><li class="frag" data-f="3"><b>기댓값</b>: 오래 반복했을 때 평균적으로 기대되는 값</li></ul></div></section>
+<section class="slide s-concept" data-steps="2" aria-roledescription="slide"><header class="sh"><h2>기댓값(평균)</h2><span class="chip">6주차</span></header><div class="two"><div class="col-t"><div class="term" class="frag" data-f="1"><div class="term-h">기댓값(expected value)</div><p>확률변수의 각 값에 그 확률을 곱해 모두 더한 값. 평균이라고도 부름</p></div><div class="fbox" class="frag" data-f="2">E(X) = x<sub>1</sub>p<sub>1</sub> + x<sub>2</sub>p<sub>2</sub> + … + x<sub>n</sub>p<sub>n</sub></div><p class="note" class="frag" data-f="2">기호 m 또는 μ로도 표시</p></div><div class="col-v"><div class="vis"><figure class="img anim" style="--d:0.10s"><img src="../img/fig/w06_%EB%AC%B4%EA%B2%8C%EC%A4%91%EC%8B%AC.png" alt="w06_무게중심.png" loading="lazy"></figure></div></div></div></section>
+<section class="slide s-example" data-steps="3" aria-roledescription="slide"><header class="sh"><h2>하루 평균 고장 건수</h2><span class="chip">6주차</span></header><div class="two"><div class="col-t"><span class="tag eng">공학 예제</span><div class="prob">어느 생산 설비의 하루 고장 건수 X의 확률분포가 표와 같을 때, X의 기댓값</div><ol class="stp"><li class="frag" data-f="1">E(X) = 0×0.5 + 1×0.3 + 2×0.15 + 3×0.05</li><li class="frag" data-f="2">= 0 + 0.3 + 0.3 + 0.15</li></ol><div class="ans" class="frag" data-f="3">답 E(X) = 0.75 (하루 평균 0.75건)</div></div><div class="col-v"><div class="vis"><table class="tbl anim up" style="--d:0.10s"><thead><tr><th>X</th><th>0</th><th>1</th><th>2</th><th>3</th><th>합계</th></tr></thead><tbody><tr><td>P(X = x)</td><td>0.5</td><td>0.3</td><td>0.15</td><td>0.05</td><td>1</td></tr><tr><td>x·P(X = x)</td><td>0</td><td>0.3</td><td>0.3</td><td>0.15</td><td>0.75</td></tr></tbody></table></div></div></div></section>
+<section class="slide s-bullets" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>기댓값은 '장기적 평균'</h2><span class="chip">6주차</span></header><div class="two"><div class="col-t"><ul class="bl "><li class="frag" data-f="1">주사위 눈 X의 기댓값: (1 + 2 + … + 6)/6 = 3.5</li><li class="frag" data-f="2">3.5라는 눈은 실제로 나올 수 없는 값</li><li class="frag" data-f="3">여러 번 반복할수록 평균이 가까워지는 값</li><li class="frag" data-f="4">→ 한 번의 예측값이 아니라 <b>장기적 평균</b></li></ul></div><div class="col-v"><div class="vis"><svg class="chart" viewBox="0 0 720 460" role="img" aria-label="주사위 눈 X의 확률분포"><line x1="70" x2="700" y1="414" y2="414" class="gl"/><text x="60" y="420" class="tk" text-anchor="end">0</text><line x1="70" x2="700" y1="323" y2="323" class="gl"/><text x="60" y="329" class="tk" text-anchor="end">0.05</text><line x1="70" x2="700" y1="232" y2="232" class="gl"/><text x="60" y="238" class="tk" text-anchor="end">0.1</text><line x1="70" x2="700" y1="140.99999999999994" y2="140.99999999999994" class="gl"/><text x="60" y="146.99999999999994" class="tk" text-anchor="end">0.15</text><line x1="70" x2="700" y1="50" y2="50" class="gl"/><text x="60" y="56" class="tk" text-anchor="end">0.2</text><line x1="70" x2="700" y1="414" y2="414" class="ax"/><text x="360" y="26" class="ct" text-anchor="middle">주사위 눈 X의 확률분포</text><rect class="bar" x="89.95" y="110.06" width="65.1" height="303.94" rx="3" style="--d:0.15s"/><text x="122.5" y="102.06" class="vl anim" text-anchor="middle" style="--d:0.60s">0.167</text><text x="122.5" y="440" class="tk" text-anchor="middle">1</text><rect class="bar" x="194.95" y="110.06" width="65.1" height="303.94" rx="3" style="--d:0.28s"/><text x="227.5" y="102.06" class="vl anim" text-anchor="middle" style="--d:0.73s">0.167</text><text x="227.5" y="440" class="tk" text-anchor="middle">2</text><rect class="bar" x="299.95" y="110.06" width="65.1" height="303.94" rx="3" style="--d:0.42s"/><text x="332.5" y="102.06" class="vl anim" text-anchor="middle" style="--d:0.87s">0.167</text><text x="332.5" y="440" class="tk" text-anchor="middle">3</text><rect class="bar" x="404.95" y="110.06" width="65.1" height="303.94" rx="3" style="--d:0.55s"/><text x="437.5" y="102.06" class="vl anim" text-anchor="middle" style="--d:1.00s">0.167</text><text x="437.5" y="440" class="tk" text-anchor="middle">4</text><rect class="bar" x="509.95" y="110.06" width="65.1" height="303.94" rx="3" style="--d:0.68s"/><text x="542.5" y="102.06" class="vl anim" text-anchor="middle" style="--d:1.13s">0.167</text><text x="542.5" y="440" class="tk" text-anchor="middle">5</text><rect class="bar" x="614.95" y="110.06" width="65.1" height="303.94" rx="3" style="--d:0.82s"/><text x="647.5" y="102.06" class="vl anim" text-anchor="middle" style="--d:1.27s">0.167</text><text x="647.5" y="440" class="tk" text-anchor="middle">6</text></svg></div></div></div></section>
+<section class="slide s-section dark" data-steps="0" aria-roledescription="slide"><div class="deco a"></div><div class="deco b anim pop" style="--d:0.20s"></div><div class="sec-txt"><div class="eyebrow">6주차 · 확률변수와 기댓값</div><h1>분산과 표준편차</h1><p class="sub">흩어진 정도</p></div></section>
+<section class="slide s-visual" data-steps="2" aria-roledescription="slide"><header class="sh"><h2>평균이 같아도 흩어진 정도는 다름</h2><span class="chip">6주차</span></header><div class="big"><div class="vis"><div class="steps n2"><figure class="anim" style="--d:0.10s"><img src="../img/fig/w06_%EA%B8%B0%EA%B3%84A.png" alt="기계 A" loading="lazy"><figcaption>기계 A</figcaption></figure><figure class="frag" data-f="1"><img src="../img/fig/w06_%EA%B8%B0%EA%B3%84B.png" alt="기계 B" loading="lazy"><figcaption>기계 B</figcaption></figure></div></div></div><p class="cap" class="frag" data-f="2">두 기계 모두 평균 길이 10 mm, 기계 B 제품의 길이가 더 들쭉날쭉</p></section>
+<section class="slide s-concept" data-steps="2" aria-roledescription="slide"><header class="sh"><h2>분산과 표준편차</h2><span class="chip">6주차</span></header><div class="two"><div class="col-t"><div class="term" class="frag" data-f="1"><div class="term-h">분산(variance)과 표준편차(standard deviation)</div><p>확률변수의 값이 평균 m에서 흩어진 정도</p></div><div class="fbox" class="frag" data-f="2">V(X) = E((X − m)<sup>2</sup>) = E(X<sup>2</sup>) − {E(X)}<sup>2</sup></div><p class="note" class="frag" data-f="2">표준편차 σ(X) = √V(X): 원래 단위로 되돌린 값</p></div><div class="col-v"><div class="vis"><table class="tbl anim up" style="--d:0.10s"><thead><tr><th></th><th>기계 A</th><th>기계 B</th></tr></thead><tbody><tr><td>평균</td><td>10</td><td>10</td></tr><tr><td>분산</td><td>0.2</td><td>2</td></tr><tr><td>표준편차</td><td>약 0.45</td><td>약 1.41</td></tr></tbody></table></div></div></div></section>
+<section class="slide s-example" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>고장 건수의 분산</h2><span class="chip">6주차</span></header><div class="two"><div class="col-t"><span class="tag eng">공학 예제</span><div class="prob">앞의 하루 고장 건수 X (E(X) = 0.75)의 분산과 표준편차</div><ol class="stp"><li class="frag" data-f="1">E(X<sup>2</sup>) = 0×0.5 + 1×0.3 + 4×0.15 + 9×0.05 = 1.35</li><li class="frag" data-f="2">V(X) = 1.35 − 0.75<sup>2</sup> = 1.35 − 0.5625</li><li class="frag" data-f="3">σ(X) = √0.7875</li></ol><div class="ans" class="frag" data-f="4">답 V(X) = 0.7875, σ(X) ≈ 0.887</div></div><div class="col-v"><div class="vis"><svg class="chart" viewBox="0 0 720 460" role="img" aria-label="x² × P(X = x)  (합 = 1.35)"><line x1="70" x2="700" y1="390" y2="390" class="gl"/><text x="60" y="396" class="tk" text-anchor="end">0</text><line x1="70" x2="700" y1="276.6666666666667" y2="276.6666666666667" class="gl"/><text x="60" y="282.6666666666667" class="tk" text-anchor="end">0.2</text><line x1="70" x2="700" y1="163.33333333333334" y2="163.33333333333334" class="gl"/><text x="60" y="169.33333333333334" class="tk" text-anchor="end">0.4</text><line x1="70" x2="700" y1="50" y2="50" class="gl"/><text x="60" y="56" class="tk" text-anchor="end">0.6</text><line x1="70" x2="700" y1="390" y2="390" class="ax"/><text x="385" y="452" class="at" text-anchor="middle">X</text><text x="360" y="26" class="ct" text-anchor="middle">x² × P(X = x)  (합 = 1.35)</text><rect class="bar" x="99.925" y="390" width="97.65" height="0.5" rx="3" style="--d:0.15s"/><text x="148.75" y="382" class="vl anim" text-anchor="middle" style="--d:0.60s">0.00</text><text x="148.75" y="416" class="tk" text-anchor="middle">0</text><rect class="bar" x="257.425" y="220.00000000000003" width="97.65" height="169.99999999999997" rx="3" style="--d:0.35s"/><text x="306.25" y="212.00000000000003" class="vl anim" text-anchor="middle" style="--d:0.80s">0.30</text><text x="306.25" y="416" class="tk" text-anchor="middle">1</text><rect class="bar" x="414.925" y="50.00000000000006" width="97.65" height="339.99999999999994" rx="3" style="--d:0.55s"/><text x="463.75" y="42.00000000000006" class="vl anim" text-anchor="middle" style="--d:1.00s">0.60</text><text x="463.75" y="416" class="tk" text-anchor="middle">2</text><rect class="bar" x="572.425" y="135.00000000000003" width="97.65" height="254.99999999999997" rx="3" style="--d:0.75s"/><text x="621.25" y="127.00000000000003" class="vl anim" text-anchor="middle" style="--d:1.20s">0.45</text><text x="621.25" y="416" class="tk" text-anchor="middle">3</text></svg></div></div></div></section>
+<section class="slide s-section dark" data-steps="0" aria-roledescription="slide"><div class="deco a"></div><div class="deco b anim pop" style="--d:0.20s"></div><div class="sec-txt"><div class="eyebrow">6주차 · 확률변수와 기댓값</div><h1>aX + b의 평균과 분산</h1><p class="sub">단위 변환과 비용 계산</p></div></section>
+<section class="slide s-concept" data-steps="2" aria-roledescription="slide"><header class="sh"><h2>확률변수 aX + b</h2><span class="chip">6주차</span></header><div class="two"><div class="col-t"><div class="term" class="frag" data-f="1"><div class="term-h">aX + b의 평균·분산</div><p>단위 변환이나 비용 계산처럼 일차식으로 바꾼 확률변수</p></div><div class="fbox" class="frag" data-f="2">E(aX + b) = aE(X) + b,   V(aX + b) = a<sup>2</sup>V(X)</div><p class="note" class="frag" data-f="2">σ(aX + b) = |a|σ(X). 더하는 b는 흩어진 정도와 무관</p></div><div class="col-v"><div class="vis"><table class="tbl anim up" style="--d:0.10s"><thead><tr><th>변환</th><th>평균</th><th>분산</th><th>표준편차</th></tr></thead><tbody><tr><td>X + b</td><td>b만큼 이동</td><td>불변</td><td>불변</td></tr><tr><td>aX</td><td>a배</td><td>a<sup>2</sup>배</td><td>|a|배</td></tr></tbody></table></div></div></div></section>
+<section class="slide s-example" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>하루 수리 비용</h2><span class="chip">6주차</span></header><div class="two"><div class="col-t"><span class="tag eng">공학 예제</span><div class="prob">고장 1건당 수리비 20만 원, 고장과 관계없는 하루 점검비 10만 원. 하루 비용 Y = 20X + 10(만 원)의 평균과 표준편차</div><ol class="stp"><li class="frag" data-f="1">E(Y) = 20 × 0.75 + 10 = 25</li><li class="frag" data-f="2">V(Y) = 20<sup>2</sup> × 0.7875 = 315</li><li class="frag" data-f="3">σ(Y) = 20 × 0.887 ≈ 17.7</li></ol><div class="ans" class="frag" data-f="4">답 평균 25만 원, 표준편차 약 17.7만 원</div></div><div class="col-v"><div class="vis"><div class="formula anim up" style="--d:0.10s"><div class="f-main">Y = 20X + 10</div><div class="f-note">a = 20, b = 10 → 분산은 a<sup>2</sup> = 400배</div></div></div></div></div></section>
+<section class="slide s-quiz" data-steps="3" aria-roledescription="slide"><header class="sh"><h2>확인 퀴즈</h2><span class="chip">6주차</span></header><div class="quiz"><div class="qrow"><span class="qn">Q1</span><div><p class="qq">P(X=1) = 0.2, P(X=2) = 0.5, P(X=3) = 0.3일 때 E(X)</p><p class="qa" class="frag" data-f="1">→ 0.2 + 1.0 + 0.9 = 2.1</p></div></div><div class="qrow"><span class="qn">Q2</span><div><p class="qq">E(X) = 4, V(X) = 2일 때 E(3X − 1)과 V(3X − 1)</p><p class="qa" class="frag" data-f="2">→ E = 11, V = 9 × 2 = 18</p></div></div><div class="qrow"><span class="qn">Q3</span><div><p class="qq">P(X=0) = a, P(X=1) = 0.3, P(X=2) = 0.5일 때 a의 값</p><p class="qa" class="frag" data-f="3">→ 1 − 0.3 − 0.5 = 0.2</p></div></div></div></section>
+<section class="slide s-summary dark" data-steps="1" aria-roledescription="slide"><h2 class="sum-h">6주차 정리</h2><div class="sums"><div class="sum anim up" style="--d:0.10s"><h3>확률분포</h3><p>각 값의 확률, 합은 1</p></div><div class="sum anim up" style="--d:0.30s"><h3>기댓값</h3><p>E(X) = Σ x<sub>i</sub>p<sub>i</sub>, 분포의 무게중심</p></div><div class="sum anim up" style="--d:0.50s"><h3>분산</h3><p>V(X) = E(X<sup>2</sup>) − {E(X)}<sup>2</sup>, σ = √V</p></div><div class="sum anim up" style="--d:0.70s"><h3>aX + b</h3><p>평균 aE(X) + b, 분산 a<sup>2</sup>V(X)</p></div></div><p class="next" class="frag" data-f="1">다음 주: 이항분포</p></section>
+<section class="slide s-credits" data-steps="0"><header class="sh"><h2>이미지 출처</h2><span class="chip">6주차</span></header><div class="credits"><table class="tbl"><thead><tr><th>자료</th><th>작가</th><th>라이선스</th></tr></thead><tbody><tr><td>주차 표지 이미지</td><td>Google Flow로 생성</td><td>AI 생성</td></tr><tr><td>Playground seesaw</td><td>Killarnee</td><td>CC BY-SA 4.0</td></tr></tbody></table><p class="cap">사진: Wikimedia Commons의 자유 라이선스 이미지 · 그래프: 직접 계산해 그림</p></div></section>
+</div>
+</main>
+<div class="controls">
+<a class="cbtn" href="week05.html" title="이전 주차">«</a>
+<button class="cbtn" id="prevBtn" aria-label="이전">‹</button>
+<span id="counter" aria-live="polite">1 / 21</span>
+<button class="cbtn" id="nextBtn" aria-label="다음">›</button>
+<a class="cbtn" href="week07.html" title="다음 주차">»</a>
+<button class="cbtn" id="fsBtn" aria-label="전체 화면 (F)">⛶</button>
+</div>
+<div class="progress"><div id="bar"></div></div>
+<script>// 슬라이드 넘기기: ←/→/스페이스, 클릭, 스와이프, F(전체 화면), 주소 #번호
+(function () {
+  const stage = document.getElementById("stage");
+  const slides = Array.from(stage.querySelectorAll(".slide"));
+  const counter = document.getElementById("counter");
+  const bar = document.getElementById("bar");
+  const showAll = new URLSearchParams(location.search).has("all");
+  let cur = -1, step = 0;
+
+  function fit() {
+    const vp = stage.parentElement;
+    const s = Math.min(vp.clientWidth / 1600, vp.clientHeight / 900);
+    stage.style.transform = `translate(-50%, -50%) scale(${s})`;
+  }
+  const maxStep = (i) => +slides[i].dataset.steps || 0;
+  function paint() {
+    slides[cur].querySelectorAll(".frag").forEach((f) => f.classList.toggle("on", +f.dataset.f <= step));
+  }
+  function go(i, st) {
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    if (i !== cur) {
+      if (cur >= 0) {
+        slides[cur].classList.remove("current", "active");
+        slides[cur].querySelectorAll("video").forEach((v) => v.pause());
+      }
+      cur = i;
+      const s = slides[cur];
+      s.classList.add("current");
+      // 표시된 다음 프레임에 active를 붙여야 등장 효과가 재생됨
+      requestAnimationFrame(() => requestAnimationFrame(() => s.classList.add("active")));
+      s.querySelectorAll("video").forEach((v) => { v.currentTime = 0; v.play().catch(() => {}); });
+      history.replaceState(null, "", `${location.search}#${cur + 1}`);
+    }
+    step = showAll ? maxStep(cur) : st;
+    paint();
+    counter.textContent = `${cur + 1} / ${slides.length}`;
+    bar.style.width = `${((cur + 1) / slides.length) * 100}%`;
+  }
+  const next = () => (step < maxStep(cur) ? go(cur, step + 1) : cur < slides.length - 1 && go(cur + 1, 0));
+  const prev = () => (step > 0 ? go(cur, step - 1) : cur > 0 && go(cur - 1, maxStep(cur - 1)));
+
+  document.addEventListener("keydown", (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); next(); }
+    else if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); prev(); }
+    else if (e.key === "Home") go(0, 0);
+    else if (e.key === "End") go(slides.length - 1, maxStep(slides.length - 1));
+    else if (e.key === "f" || e.key === "F") toggleFs();
+  });
+  stage.addEventListener("click", (e) => {
+    if (e.target.closest("a, button, video")) return;
+    const r = stage.getBoundingClientRect();
+    (e.clientX - r.left < r.width * 0.25 ? prev : next)();
+  });
+  let tx = null;
+  stage.addEventListener("touchstart", (e) => (tx = e.touches[0].clientX), { passive: true });
+  stage.addEventListener("touchend", (e) => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 50) (dx < 0 ? next : prev)();
+    tx = null;
+  });
+  document.getElementById("nextBtn").onclick = next;
+  document.getElementById("prevBtn").onclick = prev;
+  function toggleFs() {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen?.().catch(() => document.body.classList.toggle("presenting"));
+  }
+  document.getElementById("fsBtn").onclick = toggleFs;
+  document.addEventListener("fullscreenchange", () => setTimeout(fit, 50));
+  window.addEventListener("resize", fit);
+  window.addEventListener("hashchange", () => {
+    const n = parseInt(location.hash.slice(1), 10);
+    if (n && n - 1 !== cur) go(n - 1, 0);
+  });
+  fit();
+  const start = parseInt(location.hash.slice(1), 10);
+  go(start ? start - 1 : 0, 0);
+})();
+</script>
+</body>
+</html>

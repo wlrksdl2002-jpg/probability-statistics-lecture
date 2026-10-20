@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4주차 확률의 뜻과 덧셈정리 · 확률과 통계</title>
+<link rel="stylesheet" href="../assets/theme.css">
+<style>/* 웹 슬라이드 덱: 1600×900 무대를 화면 크기에 맞춰 확대·축소 */
+body.deck-page { height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; background: #14112E; }
+.viewport { flex: 1; position: relative; overflow: hidden; }
+.stage { position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; transform-origin: center; transform: translate(-50%, -50%); }
+.slide { position: absolute; inset: 0; display: none; flex-direction: column; padding: 56px 80px 60px; background: var(--bg); color: var(--text); overflow: hidden; }
+.slide.current { display: flex; }
+.slide.dark { background: var(--ink); color: #F6F5FB; }
+:fullscreen .site-nav, body.presenting .site-nav { display: none; }
+
+/* 컨트롤 바 */
+.controls { display: flex; gap: 6px; align-items: center; justify-content: center; padding: 6px; background: var(--ink-deep); color: var(--on-dark); font-size: 15px; }
+.cbtn { font: inherit; background: transparent; color: var(--on-dark); border: 1px solid var(--ink-2); border-radius: 999px; min-width: 40px; height: 34px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+.cbtn:hover { background: var(--ink-2); color: #fff; }
+.cbtn[aria-disabled="true"] { opacity: .3; pointer-events: none; }
+#counter { min-width: 80px; text-align: center; font-variant-numeric: tabular-nums; }
+.progress { height: 4px; background: var(--ink-deep); }
+#bar { height: 100%; width: 0; background: var(--coral); transition: width .3s; }
+
+/* 공통 글자 */
+.sh { display: flex; align-items: center; gap: 24px; min-height: 76px; }
+.sh h2 { margin: 0; font-size: 46px; font-weight: 900; color: var(--ink); line-height: 1.15; flex: 1; }
+.chip { background: var(--tint); color: var(--ink); font-weight: 700; font-size: 20px; padding: 6px 18px; border-radius: 999px; white-space: nowrap; }
+sub, sup { font-size: .68em; line-height: 0; }
+b { color: var(--coral-text); }
+.dark b { color: var(--gold); }
+
+/* 등장 효과: 자동(.anim) / 단계(.frag) */
+.anim { opacity: 0; transition: opacity .5s ease var(--d, 0s), transform .6s cubic-bezier(.2, .8, .2, 1) var(--d, 0s); }
+.anim.up { transform: translateY(24px); }
+.anim.pop { transform: scale(.6); transform-box: fill-box; transform-origin: center; }
+.slide.active .anim { opacity: 1; transform: none; }
+.frag { opacity: 0; transform: translateY(16px); transition: opacity .45s ease, transform .45s ease; }
+.frag.on { opacity: 1; transform: none; }
+.bar { transform: scaleY(0); transform-box: fill-box; transform-origin: bottom; transition: transform .7s cubic-bezier(.2, .8, .2, 1) var(--d, 0s); fill: var(--ink); }
+.bar.hl { fill: #E8553A; }
+.slide.active .bar { transform: scaleY(1); }
+.reveal { clip-path: inset(0 100% 0 0); transition: clip-path 1.4s ease var(--d, 0s); }
+.slide.active .reveal { clip-path: inset(0 0 0 0); }
+.draw { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset .45s ease var(--d, 0s); }
+.slide.active .draw { stroke-dashoffset: 0; }
+
+/* 차트·도식 */
+.vis { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.chart, .diagram { width: 100%; height: 100%; max-height: 640px; }
+.gl { stroke: #DDDBEA; stroke-width: 1; } .ax { stroke: #A9A3DA; stroke-width: 2; }
+.tk { font-size: 17px; fill: var(--muted); } .at { font-size: 18px; fill: var(--muted); }
+.ct { font-size: 20px; font-weight: 700; fill: var(--ink); } .vl { font-size: 16px; font-weight: 700; fill: var(--text); }
+.edge { stroke: #A9A3DA; stroke-width: 2.5; }
+.nd { fill: var(--tint); } .nd.root { fill: var(--ink); }
+.ndt { font-size: 18px; font-weight: 700; fill: var(--ink); } .ndt.root { fill: #fff; }
+.prob { font-size: 15px; font-weight: 700; fill: var(--coral-text); } .res { font-size: 16px; fill: var(--text); }
+.gridl { stroke: #B9B4E3; stroke-width: 2; } .pt { fill: var(--ink); } .ptl { font-size: 24px; font-weight: 700; fill: var(--ink); }
+.route { stroke: #E8553A; stroke-width: 8; stroke-linecap: round; }
+.pc { fill: var(--tint); } .pc.hl { fill: #E8553A; } .pct { font-weight: 700; fill: var(--ink); } .pct.hl { fill: #fff; }
+.table { fill: #F0EEFA; stroke: #A9A3DA; stroke-width: 3; }
+.seat { fill: var(--ink); } .seat.first { fill: #E8553A; } .seatt { font-size: 19px; font-weight: 700; fill: #fff; }
+.slots { display: flex; align-items: flex-start; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.slotc { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.slot { width: 104px; height: 104px; border: 3px solid var(--ink); border-radius: 14px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 900; color: var(--coral-text); text-align: center; line-height: 1.1; padding: 4px; }
+.slot.gap { border: 0; background: none; color: var(--muted); }
+.slotl { font-size: 17px; color: var(--muted); text-align: center; max-width: 120px; }
+.op { font-size: 30px; font-weight: 700; color: var(--ink); align-self: flex-start; margin-top: 32px; }
+.formula { background: var(--tint); border-radius: 24px; padding: 40px 48px; text-align: center; max-width: 100%; }
+.f-main { font-size: 46px; font-weight: 900; color: var(--ink); }
+.f-note { font-size: 22px; color: var(--muted); margin-top: 16px; }
+.tbl { border-collapse: collapse; font-size: 27px; background: #fff; border-radius: 12px; overflow: hidden; }
+.tbl th { background: var(--ink); color: #fff; padding: 14px 22px; }
+.tbl td { padding: 12px 22px; text-align: center; border-top: 1px solid #DDDBEA; }
+.tbl tbody tr:nth-child(even) td { background: #F6F5FC; }
+figure { margin: 0; }
+.img { max-width: 100%; max-height: 100%; display: flex; flex-direction: column; align-items: center; }
+.img img { max-width: 100%; max-height: 600px; object-fit: contain; border-radius: 12px; }
+figcaption { font-size: 15px; color: var(--muted); margin-top: 6px; text-align: center; }
+.steps { display: grid; gap: 14px; width: 100%; height: 100%; align-content: center; }
+.steps.n2 { grid-template-columns: 1fr 1fr; } .steps.n3 { grid-template-columns: repeat(3, 1fr); } .steps.n4 { grid-template-columns: 1fr 1fr; }
+.steps figure { display: flex; flex-direction: column; align-items: center; min-height: 0; }
+.steps img { max-width: 100%; max-height: 300px; object-fit: contain; }
+.steps.n2 img, .steps.n3 img { max-height: 560px; }
+.steps figcaption { font-size: 20px; font-weight: 700; color: var(--ink); }
+
+/* 레이아웃 */
+.two { flex: 1; display: flex; gap: 48px; margin-top: 24px; min-height: 0; }
+.col-t { flex: 1 1 0; display: flex; flex-direction: column; justify-content: center; gap: 22px; min-width: 0; }
+.col-v { flex: 1.15 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; }
+.one { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 18px; padding: 0 60px; }
+.one.narrow { padding: 0 180px; }
+.bl { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 22px; }
+.bl li { position: relative; padding-left: 34px; font-size: 29px; line-height: 1.45; }
+.bl li::before { content: ""; position: absolute; left: 4px; top: .55em; width: 13px; height: 13px; border-radius: 50%; background: var(--coral); }
+.bl.big li { font-size: 34px; }
+.term { background: var(--ink); color: #fff; border-radius: 20px; padding: 28px 32px; }
+.term-h { font-size: 32px; font-weight: 900; color: var(--gold); margin-bottom: 8px; }
+.term p { margin: 0; font-size: 27px; line-height: 1.55; }
+.term b { color: var(--gold); }
+.fbox { background: var(--tint); border-radius: 20px; padding: 22px; font-size: 31px; font-weight: 900; color: var(--ink); text-align: center; }
+.note { font-size: 24px; color: var(--muted); margin: 0; }
+.tag { align-self: flex-start; font-size: 18px; font-weight: 700; padding: 4px 16px; border-radius: 999px; }
+.tag.tb { background: var(--teal); color: #14112E; } .tag.eng { background: var(--coral-text); color: #fff; }
+.prob { background: var(--tint); border-radius: 18px; padding: 20px 26px; font-size: 28px; font-weight: 700; color: var(--ink); line-height: 1.5; }
+.stp { margin: 0; padding: 0; list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: 12px; }
+.stp li { counter-increment: s; position: relative; padding-left: 50px; font-size: 27px; line-height: 1.5; }
+.stp li::before { content: counter(s); position: absolute; left: 0; top: 4px; width: 36px; height: 36px; border-radius: 50%; background: var(--ink); color: #fff; font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.ans { background: var(--coral-text); color: #fff; border-radius: 16px; padding: 16px 26px; font-size: 32px; font-weight: 900; }
+.ans b { color: #fff; }
+.big { flex: 1; min-height: 0; margin-top: 16px; display: flex; }
+.cap { margin: 14px 0 0; background: #fff; border-radius: 14px; padding: 12px 22px; font-size: 25px; color: var(--ink); }
+.cmps { flex: 1; display: flex; gap: 32px; margin-top: 28px; align-items: center; }
+.cmp { flex: 1; border-radius: 24px; padding: 36px 40px; background: var(--tint); min-height: 380px; }
+.cmp.r { background: #fff; border: 3px solid var(--coral); }
+.cmp h3 { margin: 0 0 22px; font-size: 36px; color: var(--ink); } .cmp.r h3 { color: var(--coral-text); }
+.cmp ul { margin: 0; padding-left: 30px; display: flex; flex-direction: column; gap: 18px; font-size: 30px; line-height: 1.45; }
+.stats { flex: 1; display: flex; gap: 28px; align-items: center; margin-top: 24px; }
+.stat { flex: 1; background: var(--tint); border-radius: 24px; padding: 48px 28px; text-align: center; }
+.sv { font-size: 62px; font-weight: 900; color: var(--coral-text); line-height: 1.1; }
+.sl { font-size: 26px; margin-top: 16px; color: var(--ink); }
+.quiz { flex: 1; display: flex; flex-direction: column; gap: 18px; margin-top: 20px; }
+.qrow { flex: 1; display: flex; gap: 24px; align-items: center; background: #fff; border-radius: 18px; padding: 16px 28px; }
+.qn { flex: none; width: 58px; height: 58px; border-radius: 50%; background: var(--ink); color: #fff; font-weight: 900; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+.qq { margin: 0; font-size: 29px; font-weight: 700; color: var(--ink); } .qa { margin: 8px 0 0; font-size: 28px; font-weight: 700; color: var(--coral-text); }
+
+/* 표지·소단원·정리(어두운 슬라이드) */
+.s-cover { padding: 0; }
+.s-cover .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.s-cover .fade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(27, 23, 64, .97) 0%, rgba(27, 23, 64, .88) 36%, rgba(27, 23, 64, 0) 66%); }
+.cover-txt { position: relative; padding: 110px 90px; max-width: 760px; }
+.num { font-size: 150px; font-weight: 900; color: var(--coral); line-height: 1; }
+.eyebrow { font-size: 24px; font-weight: 700; color: var(--gold); margin: 10px 0 6px; }
+.cover-txt h1, .sec-txt h1 { font-size: 66px; font-weight: 900; line-height: 1.18; margin: 0; }
+.sub { font-size: 26px; color: var(--on-dark); margin: 22px 0 0; }
+.course { font-size: 18px; color: var(--on-dark); margin-top: 70px; }
+.gen { position: absolute; right: 28px; bottom: 16px; font-size: 15px; color: var(--on-dark); margin: 0; }
+.s-section, .s-summary { justify-content: center; }
+.deco { position: absolute; border-radius: 50%; }
+.deco.a { width: 520px; height: 520px; right: 60px; top: 140px; background: var(--ink-2); }
+.deco.b { width: 230px; height: 230px; right: 140px; top: 560px; background: var(--coral); }
+.sec-txt { position: relative; max-width: 900px; }
+.sum-h { font-size: 56px; font-weight: 900; margin: 0 0 32px; }
+.sums { display: flex; gap: 24px; }
+.sum { flex: 1; background: var(--ink-2); border-radius: 22px; padding: 36px 32px; min-height: 300px; }
+.sum h3 { margin: 0 0 14px; color: var(--gold); font-size: 34px; }
+.sum p { margin: 0; font-size: 27px; line-height: 1.55; }
+.next { margin-top: 44px; font-size: 28px; font-weight: 700; color: #FF8A6E; }
+.s-metaphor { flex-direction: row; padding: 0; }
+.mimg { width: 46%; position: relative; }
+.mimg img { width: 100%; height: 100%; object-fit: cover; }
+.mimg figcaption { position: absolute; left: 16px; bottom: 14px; margin: 0; background: rgba(20, 17, 46, .72); color: #fff; padding: 4px 10px; border-radius: 6px; }
+.mtxt { flex: 1; padding: 80px 70px; display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+.mtxt h2 { margin: 0; font-size: 46px; font-weight: 900; color: var(--ink); line-height: 1.2; }
+.pill { align-self: flex-start; background: var(--gold); color: var(--ink); font-weight: 700; padding: 4px 18px; border-radius: 999px; font-size: 18px; }
+.s-intro { padding: 0; background: #14112E; }
+.bgv { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.vfade { position: absolute; left: 0; right: 0; bottom: 0; height: 300px; background: linear-gradient(180deg, rgba(20, 17, 46, 0), rgba(20, 17, 46, .9)); }
+.vcap { position: absolute; left: 80px; bottom: 70px; margin: 0; font-size: 40px; font-weight: 900; }
+.credits { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.credits .tbl { font-size: 19px; }
+.credits .tbl td { text-align: left; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim, .frag, .bar, .reveal, .draw, #bar { transition: none !important; }
+}
+</style>
+</head>
+<body class="deck-page">
+<nav class="site-nav"><a class="brand" href="../index.html">확률과 통계</a><a class="nav-link" href="../index.html">강의 목록</a><a class="nav-link" href="../quiz.html">퀴즈</a><a class="nav-link" href="../playground.html">애니메이션 놀이터</a></nav>
+<main class="viewport" aria-label="4주차 슬라이드">
+<div class="stage" id="stage">
+<section class="slide s-cover dark" data-steps="0" aria-roledescription="slide"><img class="bg" src="../img/cover/w04_cover.jpg" alt=""><div class="fade"></div><div class="cover-txt"><div class="num anim" style="--d:0.10s">04</div><div class="eyebrow">4주차</div><h1>확률의 뜻과 덧셈정리</h1><p class="sub">경우의 수에서 확률로</p><p class="course">확률과 통계 · 공과대학 1학년</p></div><p class="gen">이미지: Google Flow로 생성</p></section>
+<section class="slide s-goals" data-steps="0" aria-roledescription="slide"><header class="sh"><h2>학습목표</h2><span class="chip">4주차</span></header><div class="cards"><div class="goal anim up" style="--d:0.10s"><span class="gn">1</span><p>수학적 확률과 통계적 확률의 구분</p></div><div class="goal anim up" style="--d:0.35s"><span class="gn">2</span><p>확률의 덧셈정리와 배반사건</p></div><div class="goal anim up" style="--d:0.60s"><span class="gn">3</span><p>여사건의 확률로 '적어도' 문제 해결</p></div></div></section>
+<section class="slide s-bullets" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>시행, 표본공간, 사건</h2><span class="chip">4주차</span></header><div class="two"><div class="col-t"><ul class="bl "><li class="frag" data-f="1">시행: 같은 조건에서 반복할 수 있는 실험이나 관찰</li><li class="frag" data-f="2">표본공간 S: 시행에서 나올 수 있는 모든 결과의 집합</li><li class="frag" data-f="3">사건: 표본공간의 부분집합</li><li class="frag" data-f="4">동전 3개 던지기 → n(S) = 2<sup>3</sup> = 8</li></ul></div><div class="col-v"><div class="vis"><svg class="diagram" viewBox="0 0 720 480" role="img" aria-label="수형도"><line x1="88" y1="240" x2="210.66666666666669" y2="120" class="edge draw" pathLength="1" style="--d:0.30s"/><line x1="88" y1="240" x2="210.66666666666669" y2="360" class="edge draw" pathLength="1" style="--d:0.30s"/><line x1="274.6666666666667" y1="120" x2="397.33333333333337" y2="60" class="edge draw" pathLength="1" style="--d:0.85s"/><line x1="274.6666666666667" y1="120" x2="397.33333333333337" y2="180" class="edge draw" pathLength="1" style="--d:0.85s"/><line x1="274.6666666666667" y1="360" x2="397.33333333333337" y2="300" class="edge draw" pathLength="1" style="--d:0.85s"/><line x1="274.6666666666667" y1="360" x2="397.33333333333337" y2="420" class="edge draw" pathLength="1" style="--d:0.85s"/><line x1="461.33333333333337" y1="60" x2="584" y2="30" class="edge draw" pathLength="1" style="--d:1.40s"/><line x1="461.33333333333337" y1="60" x2="584" y2="90" class="edge draw" pathLength="1" style="--d:1.40s"/><line x1="461.33333333333337" y1="180" x2="584" y2="150" class="edge draw" pathLength="1" style="--d:1.40s"/><line x1="461.33333333333337" y1="180" x2="584" y2="210" class="edge draw" pathLength="1" style="--d:1.40s"/><line x1="461.33333333333337" y1="300" x2="584" y2="270" class="edge draw" pathLength="1" style="--d:1.40s"/><line x1="461.33333333333337" y1="300" x2="584" y2="330" class="edge draw" pathLength="1" style="--d:1.40s"/><line x1="461.33333333333337" y1="420" x2="584" y2="390" class="edge draw" pathLength="1" style="--d:1.40s"/><line x1="461.33333333333337" y1="420" x2="584" y2="450" class="edge draw" pathLength="1" style="--d:1.40s"/><g class="anim" style="--d:0.10s"><rect x="10" y="220" width="78" height="40" rx="9" class="nd root"/><text x="49" y="246" text-anchor="middle" class="ndt root">던지기</text></g><g class="anim" style="--d:0.65s"><rect x="210.66666666666669" y="100" width="64" height="40" rx="9" class="nd"/><text x="242.66666666666669" y="126" text-anchor="middle" class="ndt">앞</text></g><g class="anim" style="--d:0.65s"><rect x="210.66666666666669" y="340" width="64" height="40" rx="9" class="nd"/><text x="242.66666666666669" y="366" text-anchor="middle" class="ndt">뒤</text></g><g class="anim" style="--d:1.20s"><rect x="397.33333333333337" y="40" width="64" height="40" rx="9" class="nd"/><text x="429.33333333333337" y="66" text-anchor="middle" class="ndt">앞</text></g><g class="anim" style="--d:1.20s"><rect x="397.33333333333337" y="160" width="64" height="40" rx="9" class="nd"/><text x="429.33333333333337" y="186" text-anchor="middle" class="ndt">뒤</text></g><g class="anim" style="--d:1.20s"><rect x="397.33333333333337" y="280" width="64" height="40" rx="9" class="nd"/><text x="429.33333333333337" y="306" text-anchor="middle" class="ndt">앞</text></g><g class="anim" style="--d:1.20s"><rect x="397.33333333333337" y="400" width="64" height="40" rx="9" class="nd"/><text x="429.33333333333337" y="426" text-anchor="middle" class="ndt">뒤</text></g><g class="anim" style="--d:1.75s"><rect x="584" y="10" width="64" height="40" rx="9" class="nd"/><text x="616" y="36" text-anchor="middle" class="ndt">앞</text></g><text x="658" y="36" class="res anim" style="--d:1.95s">앞앞앞</text><g class="anim" style="--d:1.75s"><rect x="584" y="70" width="64" height="40" rx="9" class="nd"/><text x="616" y="96" text-anchor="middle" class="ndt">뒤</text></g><text x="658" y="96" class="res anim" style="--d:1.95s">앞앞뒤</text><g class="anim" style="--d:1.75s"><rect x="584" y="130" width="64" height="40" rx="9" class="nd"/><text x="616" y="156" text-anchor="middle" class="ndt">앞</text></g><text x="658" y="156" class="res anim" style="--d:1.95s">앞뒤앞</text><g class="anim" style="--d:1.75s"><rect x="584" y="190" width="64" height="40" rx="9" class="nd"/><text x="616" y="216" text-anchor="middle" class="ndt">뒤</text></g><text x="658" y="216" class="res anim" style="--d:1.95s">앞뒤뒤</text><g class="anim" style="--d:1.75s"><rect x="584" y="250" width="64" height="40" rx="9" class="nd"/><text x="616" y="276" text-anchor="middle" class="ndt">앞</text></g><text x="658" y="276" class="res anim" style="--d:1.95s">뒤앞앞</text><g class="anim" style="--d:1.75s"><rect x="584" y="310" width="64" height="40" rx="9" class="nd"/><text x="616" y="336" text-anchor="middle" class="ndt">뒤</text></g><text x="658" y="336" class="res anim" style="--d:1.95s">뒤앞뒤</text><g class="anim" style="--d:1.75s"><rect x="584" y="370" width="64" height="40" rx="9" class="nd"/><text x="616" y="396" text-anchor="middle" class="ndt">앞</text></g><text x="658" y="396" class="res anim" style="--d:1.95s">뒤뒤앞</text><g class="anim" style="--d:1.75s"><rect x="584" y="430" width="64" height="40" rx="9" class="nd"/><text x="616" y="456" text-anchor="middle" class="ndt">뒤</text></g><text x="658" y="456" class="res anim" style="--d:1.95s">뒤뒤뒤</text></svg></div></div></div></section>
+<section class="slide s-concept" data-steps="2" aria-roledescription="slide"><header class="sh"><h2>수학적 확률</h2><span class="chip">4주차</span></header><div class="two"><div class="col-t"><div class="term" class="frag" data-f="1"><div class="term-h">수학적 확률</div><p>각 결과가 일어날 가능성이 같은 표본공간 S에서 사건 A가 일어날 확률</p></div><div class="fbox" class="frag" data-f="2">P(A) = n(A) / n(S)</div><p class="note" class="frag" data-f="2">예: 주사위 2개의 합이 7 → 6/36 = 1/6</p></div><div class="col-v"><div class="vis"><svg class="chart" viewBox="0 0 720 460" role="img" aria-label="주사위 2개의 눈의 합: 경우의 수 (전체 36)"><line x1="70" x2="700" y1="390" y2="390" class="gl"/><text x="60" y="396" class="tk" text-anchor="end">0</text><line x1="70" x2="700" y1="276.6666666666667" y2="276.6666666666667" class="gl"/><text x="60" y="282.6666666666667" class="tk" text-anchor="end">2</text><line x1="70" x2="700" y1="163.33333333333334" y2="163.33333333333334" class="gl"/><text x="60" y="169.33333333333334" class="tk" text-anchor="end">4</text><line x1="70" x2="700" y1="50" y2="50" class="gl"/><text x="60" y="56" class="tk" text-anchor="end">6</text><line x1="70" x2="700" y1="390" y2="390" class="ax"/><text x="385" y="452" class="at" text-anchor="middle">눈의 합</text><text transform="translate(18 220) rotate(-90)" class="at" text-anchor="middle">경우의 수</text><text x="360" y="26" class="ct" text-anchor="middle">주사위 2개의 눈의 합: 경우의 수 (전체 36)</text><rect class="bar" x="80.88181818181818" y="333.3333333333333" width="35.50909090909091" height="56.666666666666664" rx="3" style="--d:0.15s"/><text x="98.63636363636363" y="325.3333333333333" class="vl anim" text-anchor="middle" style="--d:0.60s">1</text><text x="98.63636363636363" y="416" class="tk" text-anchor="middle">2</text><rect class="bar" x="138.15454545454546" y="276.6666666666667" width="35.50909090909091" height="113.33333333333333" rx="3" style="--d:0.22s"/><text x="155.9090909090909" y="268.6666666666667" class="vl anim" text-anchor="middle" style="--d:0.67s">2</text><text x="155.9090909090909" y="416" class="tk" text-anchor="middle">3</text><rect class="bar" x="195.42727272727274" y="220" width="35.50909090909091" height="170" rx="3" style="--d:0.30s"/><text x="213.1818181818182" y="212" class="vl anim" text-anchor="middle" style="--d:0.75s">3</text><text x="213.1818181818182" y="416" class="tk" text-anchor="middle">4</text><rect class="bar" x="252.7" y="163.33333333333334" width="35.50909090909091" height="226.66666666666666" rx="3" style="--d:0.37s"/><text x="270.45454545454544" y="155.33333333333334" class="vl anim" text-anchor="middle" style="--d:0.82s">4</text><text x="270.45454545454544" y="416" class="tk" text-anchor="middle">5</text><rect class="bar" x="309.9727272727273" y="106.66666666666663" width="35.50909090909091" height="283.33333333333337" rx="3" style="--d:0.44s"/><text x="327.72727272727275" y="98.66666666666663" class="vl anim" text-anchor="middle" style="--d:0.89s">5</text><text x="327.72727272727275" y="416" class="tk" text-anchor="middle">6</text><rect class="bar hl" x="367.24545454545455" y="50" width="35.50909090909091" height="340" rx="3" style="--d:0.51s"/><text x="385" y="42" class="vl anim" text-anchor="middle" style="--d:0.96s">6</text><text x="385" y="416" class="tk" text-anchor="middle">7</text><rect class="bar" x="424.5181818181818" y="106.66666666666663" width="35.50909090909091" height="283.33333333333337" rx="3" style="--d:0.59s"/><text x="442.27272727272725" y="98.66666666666663" class="vl anim" text-anchor="middle" style="--d:1.04s">5</text><text x="442.27272727272725" y="416" class="tk" text-anchor="middle">8</text><rect class="bar" x="481.7909090909091" y="163.33333333333334" width="35.50909090909091" height="226.66666666666666" rx="3" style="--d:0.66s"/><text x="499.54545454545456" y="155.33333333333334" class="vl anim" text-anchor="middle" style="--d:1.11s">4</text><text x="499.54545454545456" y="416" class="tk" text-anchor="middle">9</text><rect class="bar" x="539.0636363636364" y="220" width="35.50909090909091" height="170" rx="3" style="--d:0.73s"/><text x="556.8181818181819" y="212" class="vl anim" text-anchor="middle" style="--d:1.18s">3</text><text x="556.8181818181819" y="416" class="tk" text-anchor="middle">10</text><rect class="bar" x="596.3363636363637" y="276.6666666666667" width="35.50909090909091" height="113.33333333333333" rx="3" style="--d:0.80s"/><text x="614.0909090909091" y="268.6666666666667" class="vl anim" text-anchor="middle" style="--d:1.25s">2</text><text x="614.0909090909091" y="416" class="tk" text-anchor="middle">11</text><rect class="bar" x="653.6090909090909" y="333.3333333333333" width="35.50909090909091" height="56.666666666666664" rx="3" style="--d:0.88s"/><text x="671.3636363636364" y="325.3333333333333" class="vl anim" text-anchor="middle" style="--d:1.33s">1</text><text x="671.3636363636364" y="416" class="tk" text-anchor="middle">12</text></svg></div></div></div></section>
+<section class="slide s-example" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>불량품을 꺼낼 확률</h2><span class="chip">4주차</span></header><div class="two"><div class="col-t"><span class="tag eng">공학 예제</span><div class="prob">제품 10개 중 불량품이 3개. 임의로 2개를 꺼낼 때 2개 모두 불량품일 확률</div><ol class="stp"><li class="frag" data-f="1">전체: 10개 중 2개 택하기 → <sub>10</sub>C<sub>2</sub> = 45</li><li class="frag" data-f="2">사건: 불량품 3개 중 2개 택하기 → <sub>3</sub>C<sub>2</sub> = 3</li><li class="frag" data-f="3">경우의 수로 확률 계산 → 1~3주차 내용 활용</li></ol><div class="ans" class="frag" data-f="4">답 3/45 = <b>1/15</b></div></div><div class="col-v"><div class="vis"><div class="slots"><div class="slotc anim up" style="--d:0.10s"><div class="slot"><span><sub>3</sub>C<sub>2</sub></span></div><div class="slotl">사건 A</div></div><div class="op anim" style="--d:0.20s">÷</div><div class="slotc anim up" style="--d:0.35s"><div class="slot"><span><sub>10</sub>C<sub>2</sub></span></div><div class="slotl">표본공간 S</div></div></div></div></div></div></section>
+<section class="slide s-metaphor" data-steps="3" aria-roledescription="slide"><figure class="mimg"><img src="../img/web/w04_%EB%8F%99%EC%A0%84.jpg" alt="동전 한 번은 예측 불가, 만 번은 예측 가능"><figcaption>사진: ICMA Photos / CC BY-SA 2.0 / Wikimedia Commons</figcaption></figure><div class="mtxt"><span class="pill">비유</span><h2>동전 한 번은 예측 불가, 만 번은 예측 가능</h2><ul class="bl "><li class="frag" data-f="1">한 번 던진 결과: 앞뒤 예측 불가</li><li class="frag" data-f="2">여러 번 반복: 앞면 비율이 일정한 값에 가까워짐</li><li class="frag" data-f="3">확률 = 반복할 때 드러나는 규칙성</li></ul></div></section>
+<section class="slide s-concept" data-steps="5" aria-roledescription="slide"><header class="sh"><h2>통계적 확률과 큰수의 법칙</h2><span class="chip">4주차</span></header><div class="two"><div class="col-t"><div class="term" class="frag" data-f="1"><div class="term-h">통계적 확률</div><p>같은 시행을 n번 반복할 때 사건 A가 r<sub>n</sub>번 일어나면, n이 충분히 클 때 상대도수 r<sub>n</sub>/n이 가까워지는 일정한 값</p></div><div class="fbox" class="frag" data-f="2">r<sub>n</sub> / n  →  P(A)</div><p class="note" class="frag" data-f="2">예: 부품 2000개 검사, 불량 36개 → 불량률 약 0.018</p></div><div class="col-v"><div class="vis"><div class="steps n4"><figure class="anim" style="--d:0.10s"><img src="../img/fig/w04_%EB%8C%80%EC%88%98%EB%B2%95%EC%B9%99_10.png" alt="10번" loading="lazy"><figcaption>10번</figcaption></figure><figure class="frag" data-f="3"><img src="../img/fig/w04_%EB%8C%80%EC%88%98%EB%B2%95%EC%B9%99_100.png" alt="100번" loading="lazy"><figcaption>100번</figcaption></figure><figure class="frag" data-f="4"><img src="../img/fig/w04_%EB%8C%80%EC%88%98%EB%B2%95%EC%B9%99_1000.png" alt="1,000번" loading="lazy"><figcaption>1,000번</figcaption></figure><figure class="frag" data-f="5"><img src="../img/fig/w04_%EB%8C%80%EC%88%98%EB%B2%95%EC%B9%99_10000.png" alt="10,000번" loading="lazy"><figcaption>10,000번</figcaption></figure></div></div></div></div></section>
+<section class="slide s-compare" data-steps="1" aria-roledescription="slide"><header class="sh"><h2>수학적 확률 vs 통계적 확률</h2><span class="chip">4주차</span></header><div class="cmps"><div class="cmp l anim up" style="--d:0.10s"><h3>수학적 확률</h3><ul><li>근거: 경우의 수 계산</li><li>조건: 각 결과가 일어날 가능성이 모두 동일</li><li>예: 주사위 눈 1이 나올 확률 1/6</li><li>실험 없이 계산 가능</li></ul></div><div class="cmp r frag" data-f="1"><h3>통계적 확률</h3><ul><li>근거: 반복 실험의 상대도수</li><li>조건: 충분히 많은 반복</li><li>예: 공정 불량률, 부품 고장률</li><li>공학 현장에서 주로 사용</li></ul></div></div></section>
+<section class="slide s-bullets" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>확률의 기본 성질</h2><span class="chip">4주차</span></header><div class="two"><div class="col-t"><ul class="bl "><li class="frag" data-f="1">임의의 사건 A에 대하여 0 ≤ P(A) ≤ 1</li><li class="frag" data-f="2">반드시 일어나는 사건: P(S) = 1</li><li class="frag" data-f="3">절대 일어나지 않는 사건: P(∅) = 0</li><li class="frag" data-f="4">확률이 1보다 크거나 음수이면 계산 오류</li></ul></div><div class="col-v"><div class="vis"><div class="formula anim up" style="--d:0.10s"><div class="f-main">0 ≤ P(A) ≤ 1</div><div class="f-note">P(∅) = 0,  P(S) = 1</div></div></div></div></div></section>
+<section class="slide s-section dark" data-steps="0" aria-roledescription="slide"><div class="deco a"></div><div class="deco b anim pop" style="--d:0.20s"></div><div class="sec-txt"><div class="eyebrow">4주차 · 확률의 뜻과 덧셈정리</div><h1>확률의 덧셈정리</h1><p class="sub">합사건의 확률</p></div></section>
+<section class="slide s-bullets" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>합사건과 곱사건</h2><span class="chip">4주차</span></header><div class="two"><div class="col-t"><ul class="bl "><li class="frag" data-f="1">합사건 A ∪ B: A 또는 B가 일어나는 사건</li><li class="frag" data-f="2">곱사건 A ∩ B: A와 B가 동시에 일어나는 사건</li><li class="frag" data-f="3">벤 다이어그램으로 영역 확인</li></ul></div><div class="col-v"><div class="vis"><div class="steps n2"><figure class="anim" style="--d:0.10s"><img src="../img/fig/w04_%EB%B2%A4_%ED%95%A9.png" alt="A ∪ B" loading="lazy"><figcaption>A ∪ B</figcaption></figure><figure class="frag" data-f="4"><img src="../img/fig/w04_%EB%B2%A4_%EA%B3%B1.png" alt="A ∩ B" loading="lazy"><figcaption>A ∩ B</figcaption></figure></div></div></div></div></section>
+<section class="slide s-concept" data-steps="2" aria-roledescription="slide"><header class="sh"><h2>확률의 덧셈정리</h2><span class="chip">4주차</span></header><div class="two"><div class="col-t"><div class="term" class="frag" data-f="1"><div class="term-h">덧셈정리</div><p>두 사건 A, B에 대하여 A 또는 B가 일어날 확률</p></div><div class="fbox" class="frag" data-f="2">P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</div><p class="note" class="frag" data-f="2">P(A) + P(B)에서 겹친 부분 A ∩ B가 두 번 더해짐 → 한 번 빼기</p></div><div class="col-v"><div class="vis"><figure class="img anim" style="--d:0.10s"><img src="../img/fig/w04_%EB%B2%A4_%EA%B3%B1.png" alt="w04_벤_곱.png" loading="lazy"></figure></div></div></div></section>
+<section class="slide s-example" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>2의 배수 또는 3의 배수</h2><span class="chip">4주차</span></header><div class="two"><div class="col-t"><span class="tag tb">교과서 예제</span><div class="prob">1부터 20까지 적힌 카드 20장 중 1장을 뽑을 때, 2의 배수 또는 3의 배수일 확률</div><ol class="stp"><li class="frag" data-f="1">A: 2의 배수 → 10장, P(A) = 10/20</li><li class="frag" data-f="2">B: 3의 배수 → 6장, P(B) = 6/20</li><li class="frag" data-f="3">A ∩ B: 6의 배수 → 3장, P(A ∩ B) = 3/20</li></ol><div class="ans" class="frag" data-f="4">답 10/20 + 6/20 − 3/20 = <b>13/20</b></div></div><div class="col-v"><div class="vis"><table class="tbl anim up" style="--d:0.10s"><thead><tr><th>사건</th><th>카드</th><th>확률</th></tr></thead><tbody><tr><td>A (2의 배수)</td><td>2, 4, …, 20</td><td>10/20</td></tr><tr><td>B (3의 배수)</td><td>3, 6, …, 18</td><td>6/20</td></tr><tr><td>A ∩ B (6의 배수)</td><td>6, 12, 18</td><td>3/20</td></tr></tbody></table></div></div></div></section>
+<section class="slide s-example" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>부품 검사: 결함이 하나라도 있을 확률</h2><span class="chip">4주차</span></header><div class="two"><div class="col-t"><span class="tag eng">공학 예제</span><div class="prob">외관 결함 확률 0.05, 전기적 결함 확률 0.03, 두 결함이 모두 있을 확률 0.01일 때 결함이 하나라도 있을 확률</div><ol class="stp"><li class="frag" data-f="1">A: 외관 결함, B: 전기적 결함</li><li class="frag" data-f="2">'하나라도' = A ∪ B</li><li class="frag" data-f="3">0.05 + 0.03 − 0.01</li></ol><div class="ans" class="frag" data-f="4">답 P(A ∪ B) = <b>0.07</b></div></div><div class="col-v"><div class="vis"><svg class="chart" viewBox="0 0 720 460" role="img" aria-label="결함 확률"><line x1="70" x2="700" y1="414" y2="414" class="gl"/><text x="60" y="420" class="tk" text-anchor="end">0</text><line x1="70" x2="700" y1="323" y2="323" class="gl"/><text x="60" y="329" class="tk" text-anchor="end">0.02</text><line x1="70" x2="700" y1="232" y2="232" class="gl"/><text x="60" y="238" class="tk" text-anchor="end">0.04</text><line x1="70" x2="700" y1="141" y2="141" class="gl"/><text x="60" y="147" class="tk" text-anchor="end">0.06</text><line x1="70" x2="700" y1="50" y2="50" class="gl"/><text x="60" y="56" class="tk" text-anchor="end">0.08</text><line x1="70" x2="700" y1="414" y2="414" class="ax"/><text x="360" y="26" class="ct" text-anchor="middle">결함 확률</text><rect class="bar" x="99.925" y="186.5" width="97.65" height="227.5" rx="3" style="--d:0.15s"/><text x="148.75" y="178.5" class="vl anim" text-anchor="middle" style="--d:0.60s">0.05</text><text x="148.75" y="440" class="tk" text-anchor="middle">외관 P(A)</text><rect class="bar" x="257.425" y="277.5" width="97.65" height="136.5" rx="3" style="--d:0.35s"/><text x="306.25" y="269.5" class="vl anim" text-anchor="middle" style="--d:0.80s">0.03</text><text x="306.25" y="440" class="tk" text-anchor="middle">전기 P(B)</text><rect class="bar" x="414.925" y="368.5" width="97.65" height="45.5" rx="3" style="--d:0.55s"/><text x="463.75" y="360.5" class="vl anim" text-anchor="middle" style="--d:1.00s">0.01</text><text x="463.75" y="440" class="tk" text-anchor="middle">둘 다 P(A∩B)</text><rect class="bar hl" x="572.425" y="95.49999999999994" width="97.65" height="318.50000000000006" rx="3" style="--d:0.75s"/><text x="621.25" y="87.49999999999994" class="vl anim" text-anchor="middle" style="--d:1.20s">0.07</text><text x="621.25" y="440" class="tk" text-anchor="middle">하나라도 P(A∪B)</text></svg></div></div></div></section>
+<section class="slide s-concept" data-steps="2" aria-roledescription="slide"><header class="sh"><h2>배반사건</h2><span class="chip">4주차</span></header><div class="two"><div class="col-t"><div class="term" class="frag" data-f="1"><div class="term-h">배반사건</div><p>A ∩ B = ∅, 즉 두 사건이 동시에 일어나지 않는 관계</p></div><div class="fbox" class="frag" data-f="2">P(A ∪ B) = P(A) + P(B)</div><p class="note" class="frag" data-f="2">예: 주사위 2개의 합이 3 또는 11 → 2/36 + 2/36 = 1/9</p></div><div class="col-v"><div class="vis"><figure class="img anim" style="--d:0.10s"><img src="../img/fig/w04_%EB%B2%A4_%EB%B0%B0%EB%B0%98.png" alt="w04_벤_배반.png" loading="lazy"></figure></div></div></div></section>
+<section class="slide s-section dark" data-steps="0" aria-roledescription="slide"><div class="deco a"></div><div class="deco b anim pop" style="--d:0.20s"></div><div class="sec-txt"><div class="eyebrow">4주차 · 확률의 뜻과 덧셈정리</div><h1>여사건의 확률</h1><p class="sub">'적어도'는 반대로 생각</p></div></section>
+<section class="slide s-metaphor" data-steps="3" aria-roledescription="slide"><figure class="mimg"><img src="../img/web/w04_%EC%9A%B0%EC%82%B0.jpg" alt="비 올 확률 30%면 안 올 확률은?"><figcaption>사진: Emmanuelkwizera / CC BY-SA 4.0 / Wikimedia Commons</figcaption></figure><div class="mtxt"><span class="pill">비유</span><h2>비 올 확률 30%면 안 올 확률은?</h2><ul class="bl "><li class="frag" data-f="1">비가 온다 / 안 온다: 둘 중 하나는 반드시 일어남</li><li class="frag" data-f="2">P(비 안 옴) = 1 − 0.3 = 0.7</li><li class="frag" data-f="3">직접 세기 어려우면 반대 사건을 세기</li></ul></div></section>
+<section class="slide s-concept" data-steps="2" aria-roledescription="slide"><header class="sh"><h2>여사건의 확률</h2><span class="chip">4주차</span></header><div class="two"><div class="col-t"><div class="term" class="frag" data-f="1"><div class="term-h">여사건 A<sup>c</sup></div><p>사건 A가 일어나지 않는 사건. A와 A<sup>c</sup>는 서로 배반사건</p></div><div class="fbox" class="frag" data-f="2">P(A<sup>c</sup>) = 1 − P(A)</div><p class="note" class="frag" data-f="2">'적어도 하나'의 확률 = 1 − '하나도 없음'의 확률</p></div><div class="col-v"><div class="vis"><figure class="img anim" style="--d:0.10s"><img src="../img/fig/w04_%EB%B2%A4_%EC%97%AC%EC%82%AC%EA%B1%B4.png" alt="w04_벤_여사건.png" loading="lazy"></figure></div></div></div></section>
+<section class="slide s-example" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>적어도 1개가 불량품일 확률</h2><span class="chip">4주차</span></header><div class="two"><div class="col-t"><span class="tag eng">공학 예제</span><div class="prob">제품 10개 중 불량품 3개. 임의로 3개를 꺼낼 때 적어도 1개가 불량품일 확률</div><ol class="stp"><li class="frag" data-f="1">여사건: 3개 모두 정상품</li><li class="frag" data-f="2">정상품 7개 중 3개: <sub>7</sub>C<sub>3</sub> = 35, 전체 <sub>10</sub>C<sub>3</sub> = 120</li><li class="frag" data-f="3">P(모두 정상) = 35/120 = 7/24</li></ol><div class="ans" class="frag" data-f="4">답 1 − 7/24 = <b>17/24</b> (약 0.71)</div></div><div class="col-v"><div class="vis"><div class="formula anim up" style="--d:0.10s"><div class="f-main">P(A) = 1 − <sub>7</sub>C<sub>3</sub> / <sub>10</sub>C<sub>3</sub></div><div class="f-note">직접 세면 불량 1개, 2개, 3개 세 경우 → 여사건이 간단</div></div></div></div></div></section>
+<section class="slide s-visual" data-steps="1" aria-roledescription="slide"><header class="sh"><h2>생일 문제: 여사건의 위력</h2><span class="chip">4주차</span></header><div class="big"><div class="vis"><svg class="chart" viewBox="0 0 720 460" role="img" aria-label="n명 중 생일이 같은 사람이 있을 확률"><line x1="70" x2="696" y1="390" y2="390" class="gl"/><text x="60" y="396" class="tk" text-anchor="end">0</text><line x1="70" x2="696" y1="322" y2="322" class="gl"/><text x="60" y="328" class="tk" text-anchor="end">0.2</text><line x1="70" x2="696" y1="254" y2="254" class="gl"/><text x="60" y="260" class="tk" text-anchor="end">0.4</text><line x1="70" x2="696" y1="185.99999999999997" y2="185.99999999999997" class="gl"/><text x="60" y="191.99999999999997" class="tk" text-anchor="end">0.6</text><line x1="70" x2="696" y1="117.99999999999999" y2="117.99999999999999" class="gl"/><text x="60" y="123.99999999999999" class="tk" text-anchor="end">0.8</text><line x1="70" x2="696" y1="50" y2="50" class="gl"/><text x="60" y="56" class="tk" text-anchor="end">1</text><line x1="70" x2="696" y1="390" y2="390" class="ax"/><text x="383" y="452" class="at" text-anchor="middle">사람 수 n</text><text transform="translate(18 220) rotate(-90)" class="at" text-anchor="middle">확률</text><text x="360" y="26" class="ct" text-anchor="middle">n명 중 생일이 같은 사람이 있을 확률</text><text x="70" y="416" class="tk" text-anchor="middle">5</text><text x="126.9090909090909" y="416" class="tk" text-anchor="middle">10</text><text x="183.8181818181818" y="416" class="tk" text-anchor="middle">15</text><text x="240.72727272727272" y="416" class="tk" text-anchor="middle">20</text><text x="297.6363636363636" y="416" class="tk" text-anchor="middle">25</text><text x="354.54545454545456" y="416" class="tk" text-anchor="middle">30</text><text x="411.45454545454544" y="416" class="tk" text-anchor="middle">35</text><text x="468.3636363636364" y="416" class="tk" text-anchor="middle">40</text><text x="525.2727272727273" y="416" class="tk" text-anchor="middle">45</text><text x="582.1818181818182" y="416" class="tk" text-anchor="middle">50</text><text x="639.0909090909091" y="416" class="tk" text-anchor="middle">55</text><text x="696" y="416" class="tk" text-anchor="middle">60</text><g class="reveal" style="--d:0.20s"><polyline points="70.0,380.8 126.9,350.2 183.8,304.0 240.7,250.3 297.6,196.5 354.5,150.0 411.5,113.2 468.4,87.1 525.3,70.1 582.2,60.2 639.1,54.8 696.0,52.0" fill="none" stroke="#26215C" stroke-width="4" stroke-linejoin="round"/><circle cx="70" cy="380.82" r="6" fill="#26215C"/><circle cx="126.9090909090909" cy="350.22" r="6" fill="#26215C"/><circle cx="183.8181818181818" cy="303.98" r="6" fill="#26215C"/><circle cx="240.72727272727272" cy="250.26" r="6" fill="#26215C"/><circle cx="297.6363636363636" cy="196.54000000000002" r="6" fill="#26215C"/><circle cx="354.54545454545456" cy="149.96" r="6" fill="#26215C"/><circle cx="411.45454545454544" cy="113.24000000000001" r="6" fill="#26215C"/><circle cx="468.3636363636364" cy="87.06" r="6" fill="#26215C"/><circle cx="525.2727272727273" cy="70.06000000000002" r="6" fill="#26215C"/><circle cx="582.1818181818182" cy="60.20000000000001" r="6" fill="#26215C"/><circle cx="639.0909090909091" cy="54.760000000000005" r="6" fill="#26215C"/><circle cx="696" cy="52.04" r="6" fill="#26215C"/></g></svg></div></div><p class="cap" class="frag" data-f="1">1 − (모두 다를 확률) = 1 − <sub>365</sub>P<sub>n</sub> / 365<sup>n</sup>. 23명이면 약 0.507로 절반 초과</p></section>
+<section class="slide s-quiz" data-steps="3" aria-roledescription="slide"><header class="sh"><h2>확인 퀴즈</h2><span class="chip">4주차</span></header><div class="quiz"><div class="qrow"><span class="qn">Q1</span><div><p class="qq">주사위 2개를 던질 때 눈의 합이 9 이상일 확률</p><p class="qa" class="frag" data-f="1">→ (4 + 3 + 2 + 1)/36 = 5/18</p></div></div><div class="qrow"><span class="qn">Q2</span><div><p class="qq">P(A) = 0.4, P(B) = 0.5, P(A ∩ B) = 0.2일 때 P(A ∪ B)</p><p class="qa" class="frag" data-f="2">→ 0.4 + 0.5 − 0.2 = 0.7</p></div></div><div class="qrow"><span class="qn">Q3</span><div><p class="qq">서로 다른 동전 4개를 던질 때 적어도 1개가 뒷면일 확률</p><p class="qa" class="frag" data-f="3">→ 1 − 1/16 = 15/16</p></div></div></div></section>
+<section class="slide s-summary dark" data-steps="1" aria-roledescription="slide"><h2 class="sum-h">4주차 정리</h2><div class="sums"><div class="sum anim up" style="--d:0.10s"><h3>수학적 확률</h3><p>P(A) = n(A) / n(S)</p></div><div class="sum anim up" style="--d:0.30s"><h3>통계적 확률</h3><p>반복 시 상대도수가 가까워지는 값</p></div><div class="sum anim up" style="--d:0.50s"><h3>덧셈정리</h3><p>P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</p></div><div class="sum anim up" style="--d:0.70s"><h3>여사건</h3><p>P(A<sup>c</sup>) = 1 − P(A), '적어도'에 활용</p></div></div><p class="next" class="frag" data-f="1">다음 주: 조건부확률과 독립</p></section>
+<section class="slide s-credits" data-steps="0"><header class="sh"><h2>이미지 출처</h2><span class="chip">4주차</span></header><div class="credits"><table class="tbl"><thead><tr><th>자료</th><th>작가</th><th>라이선스</th></tr></thead><tbody><tr><td>주차 표지 이미지</td><td>Google Flow로 생성</td><td>AI 생성</td></tr><tr><td>Coin Toss (3635981474)</td><td>ICMA Photos</td><td>CC BY-SA 2.0</td></tr><tr><td>A man walks through heavy rain under an umbrella in Kigali, Rwanda. Emmanuel Kwizera</td><td>Emmanuelkwizera</td><td>CC BY-SA 4.0</td></tr></tbody></table><p class="cap">사진: Wikimedia Commons의 자유 라이선스 이미지 · 그래프: 직접 계산해 그림</p></div></section>
+</div>
+</main>
+<div class="controls">
+<a class="cbtn" href="week03.html" title="이전 주차">«</a>
+<button class="cbtn" id="prevBtn" aria-label="이전">‹</button>
+<span id="counter" aria-live="polite">1 / 23</span>
+<button class="cbtn" id="nextBtn" aria-label="다음">›</button>
+<a class="cbtn" href="week05.html" title="다음 주차">»</a>
+<button class="cbtn" id="fsBtn" aria-label="전체 화면 (F)">⛶</button>
+</div>
+<div class="progress"><div id="bar"></div></div>
+<script>// 슬라이드 넘기기: ←/→/스페이스, 클릭, 스와이프, F(전체 화면), 주소 #번호
+(function () {
+  const stage = document.getElementById("stage");
+  const slides = Array.from(stage.querySelectorAll(".slide"));
+  const counter = document.getElementById("counter");
+  const bar = document.getElementById("bar");
+  const showAll = new URLSearchParams(location.search).has("all");
+  let cur = -1, step = 0;
+
+  function fit() {
+    const vp = stage.parentElement;
+    const s = Math.min(vp.clientWidth / 1600, vp.clientHeight / 900);
+    stage.style.transform = `translate(-50%, -50%) scale(${s})`;
+  }
+  const maxStep = (i) => +slides[i].dataset.steps || 0;
+  function paint() {
+    slides[cur].querySelectorAll(".frag").forEach((f) => f.classList.toggle("on", +f.dataset.f <= step));
+  }
+  function go(i, st) {
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    if (i !== cur) {
+      if (cur >= 0) {
+        slides[cur].classList.remove("current", "active");
+        slides[cur].querySelectorAll("video").forEach((v) => v.pause());
+      }
+      cur = i;
+      const s = slides[cur];
+      s.classList.add("current");
+      // 표시된 다음 프레임에 active를 붙여야 등장 효과가 재생됨
+      requestAnimationFrame(() => requestAnimationFrame(() => s.classList.add("active")));
+      s.querySelectorAll("video").forEach((v) => { v.currentTime = 0; v.play().catch(() => {}); });
+      history.replaceState(null, "", `${location.search}#${cur + 1}`);
+    }
+    step = showAll ? maxStep(cur) : st;
+    paint();
+    counter.textContent = `${cur + 1} / ${slides.length}`;
+    bar.style.width = `${((cur + 1) / slides.length) * 100}%`;
+  }
+  const next = () => (step < maxStep(cur) ? go(cur, step + 1) : cur < slides.length - 1 && go(cur + 1, 0));
+  const prev = () => (step > 0 ? go(cur, step - 1) : cur > 0 && go(cur - 1, maxStep(cur - 1)));
+
+  document.addEventListener("keydown", (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); next(); }
+    else if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); prev(); }
+    else if (e.key === "Home") go(0, 0);
+    else if (e.key === "End") go(slides.length - 1, maxStep(slides.length - 1));
+    else if (e.key === "f" || e.key === "F") toggleFs();
+  });
+  stage.addEventListener("click", (e) => {
+    if (e.target.closest("a, button, video")) return;
+    const r = stage.getBoundingClientRect();
+    (e.clientX - r.left < r.width * 0.25 ? prev : next)();
+  });
+  let tx = null;
+  stage.addEventListener("touchstart", (e) => (tx = e.touches[0].clientX), { passive: true });
+  stage.addEventListener("touchend", (e) => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 50) (dx < 0 ? next : prev)();
+    tx = null;
+  });
+  document.getElementById("nextBtn").onclick = next;
+  document.getElementById("prevBtn").onclick = prev;
+  function toggleFs() {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen?.().catch(() => document.body.classList.toggle("presenting"));
+  }
+  document.getElementById("fsBtn").onclick = toggleFs;
+  document.addEventListener("fullscreenchange", () => setTimeout(fit, 50));
+  window.addEventListener("resize", fit);
+  window.addEventListener("hashchange", () => {
+    const n = parseInt(location.hash.slice(1), 10);
+    if (n && n - 1 !== cur) go(n - 1, 0);
+  });
+  fit();
+  const start = parseInt(location.hash.slice(1), 10);
+  go(start ? start - 1 : 0, 0);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2주차 같은 것이 있는 순열과 중복조합 · 확률과 통계</title>
+<link rel="stylesheet" href="../assets/theme.css">
+<style>/* 웹 슬라이드 덱: 1600×900 무대를 화면 크기에 맞춰 확대·축소 */
+body.deck-page { height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden; background: #14112E; }
+.viewport { flex: 1; position: relative; overflow: hidden; }
+.stage { position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; transform-origin: center; transform: translate(-50%, -50%); }
+.slide { position: absolute; inset: 0; display: none; flex-direction: column; padding: 56px 80px 60px; background: var(--bg); color: var(--text); overflow: hidden; }
+.slide.current { display: flex; }
+.slide.dark { background: var(--ink); color: #F6F5FB; }
+:fullscreen .site-nav, body.presenting .site-nav { display: none; }
+
+/* 컨트롤 바 */
+.controls { display: flex; gap: 6px; align-items: center; justify-content: center; padding: 6px; background: var(--ink-deep); color: var(--on-dark); font-size: 15px; }
+.cbtn { font: inherit; background: transparent; color: var(--on-dark); border: 1px solid var(--ink-2); border-radius: 999px; min-width: 40px; height: 34px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; }
+.cbtn:hover { background: var(--ink-2); color: #fff; }
+.cbtn[aria-disabled="true"] { opacity: .3; pointer-events: none; }
+#counter { min-width: 80px; text-align: center; font-variant-numeric: tabular-nums; }
+.progress { height: 4px; background: var(--ink-deep); }
+#bar { height: 100%; width: 0; background: var(--coral); transition: width .3s; }
+
+/* 공통 글자 */
+.sh { display: flex; align-items: center; gap: 24px; min-height: 76px; }
+.sh h2 { margin: 0; font-size: 46px; font-weight: 900; color: var(--ink); line-height: 1.15; flex: 1; }
+.chip { background: var(--tint); color: var(--ink); font-weight: 700; font-size: 20px; padding: 6px 18px; border-radius: 999px; white-space: nowrap; }
+sub, sup { font-size: .68em; line-height: 0; }
+b { color: var(--coral-text); }
+.dark b { color: var(--gold); }
+
+/* 등장 효과: 자동(.anim) / 단계(.frag) */
+.anim { opacity: 0; transition: opacity .5s ease var(--d, 0s), transform .6s cubic-bezier(.2, .8, .2, 1) var(--d, 0s); }
+.anim.up { transform: translateY(24px); }
+.anim.pop { transform: scale(.6); transform-box: fill-box; transform-origin: center; }
+.slide.active .anim { opacity: 1; transform: none; }
+.frag { opacity: 0; transform: translateY(16px); transition: opacity .45s ease, transform .45s ease; }
+.frag.on { opacity: 1; transform: none; }
+.bar { transform: scaleY(0); transform-box: fill-box; transform-origin: bottom; transition: transform .7s cubic-bezier(.2, .8, .2, 1) var(--d, 0s); fill: var(--ink); }
+.bar.hl { fill: #E8553A; }
+.slide.active .bar { transform: scaleY(1); }
+.reveal { clip-path: inset(0 100% 0 0); transition: clip-path 1.4s ease var(--d, 0s); }
+.slide.active .reveal { clip-path: inset(0 0 0 0); }
+.draw { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset .45s ease var(--d, 0s); }
+.slide.active .draw { stroke-dashoffset: 0; }
+
+/* 차트·도식 */
+.vis { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+.chart, .diagram { width: 100%; height: 100%; max-height: 640px; }
+.gl { stroke: #DDDBEA; stroke-width: 1; } .ax { stroke: #A9A3DA; stroke-width: 2; }
+.tk { font-size: 17px; fill: var(--muted); } .at { font-size: 18px; fill: var(--muted); }
+.ct { font-size: 20px; font-weight: 700; fill: var(--ink); } .vl { font-size: 16px; font-weight: 700; fill: var(--text); }
+.edge { stroke: #A9A3DA; stroke-width: 2.5; }
+.nd { fill: var(--tint); } .nd.root { fill: var(--ink); }
+.ndt { font-size: 18px; font-weight: 700; fill: var(--ink); } .ndt.root { fill: #fff; }
+.prob { font-size: 15px; font-weight: 700; fill: var(--coral-text); } .res { font-size: 16px; fill: var(--text); }
+.gridl { stroke: #B9B4E3; stroke-width: 2; } .pt { fill: var(--ink); } .ptl { font-size: 24px; font-weight: 700; fill: var(--ink); }
+.route { stroke: #E8553A; stroke-width: 8; stroke-linecap: round; }
+.pc { fill: var(--tint); } .pc.hl { fill: #E8553A; } .pct { font-weight: 700; fill: var(--ink); } .pct.hl { fill: #fff; }
+.table { fill: #F0EEFA; stroke: #A9A3DA; stroke-width: 3; }
+.seat { fill: var(--ink); } .seat.first { fill: #E8553A; } .seatt { font-size: 19px; font-weight: 700; fill: #fff; }
+.slots { display: flex; align-items: flex-start; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.slotc { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.slot { width: 104px; height: 104px; border: 3px solid var(--ink); border-radius: 14px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 900; color: var(--coral-text); text-align: center; line-height: 1.1; padding: 4px; }
+.slot.gap { border: 0; background: none; color: var(--muted); }
+.slotl { font-size: 17px; color: var(--muted); text-align: center; max-width: 120px; }
+.op { font-size: 30px; font-weight: 700; color: var(--ink); align-self: flex-start; margin-top: 32px; }
+.formula { background: var(--tint); border-radius: 24px; padding: 40px 48px; text-align: center; max-width: 100%; }
+.f-main { font-size: 46px; font-weight: 900; color: var(--ink); }
+.f-note { font-size: 22px; color: var(--muted); margin-top: 16px; }
+.tbl { border-collapse: collapse; font-size: 27px; background: #fff; border-radius: 12px; overflow: hidden; }
+.tbl th { background: var(--ink); color: #fff; padding: 14px 22px; }
+.tbl td { padding: 12px 22px; text-align: center; border-top: 1px solid #DDDBEA; }
+.tbl tbody tr:nth-child(even) td { background: #F6F5FC; }
+figure { margin: 0; }
+.img { max-width: 100%; max-height: 100%; display: flex; flex-direction: column; align-items: center; }
+.img img { max-width: 100%; max-height: 600px; object-fit: contain; border-radius: 12px; }
+figcaption { font-size: 15px; color: var(--muted); margin-top: 6px; text-align: center; }
+.steps { display: grid; gap: 14px; width: 100%; height: 100%; align-content: center; }
+.steps.n2 { grid-template-columns: 1fr 1fr; } .steps.n3 { grid-template-columns: repeat(3, 1fr); } .steps.n4 { grid-template-columns: 1fr 1fr; }
+.steps figure { display: flex; flex-direction: column; align-items: center; min-height: 0; }
+.steps img { max-width: 100%; max-height: 300px; object-fit: contain; }
+.steps.n2 img, .steps.n3 img { max-height: 560px; }
+.steps figcaption { font-size: 20px; font-weight: 700; color: var(--ink); }
+
+/* 레이아웃 */
+.two { flex: 1; display: flex; gap: 48px; margin-top: 24px; min-height: 0; }
+.col-t { flex: 1 1 0; display: flex; flex-direction: column; justify-content: center; gap: 22px; min-width: 0; }
+.col-v { flex: 1.15 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; }
+.one { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 18px; padding: 0 60px; }
+.one.narrow { padding: 0 180px; }
+.bl { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 22px; }
+.bl li { position: relative; padding-left: 34px; font-size: 29px; line-height: 1.45; }
+.bl li::before { content: ""; position: absolute; left: 4px; top: .55em; width: 13px; height: 13px; border-radius: 50%; background: var(--coral); }
+.bl.big li { font-size: 34px; }
+.term { background: var(--ink); color: #fff; border-radius: 20px; padding: 28px 32px; }
+.term-h { font-size: 32px; font-weight: 900; color: var(--gold); margin-bottom: 8px; }
+.term p { margin: 0; font-size: 27px; line-height: 1.55; }
+.term b { color: var(--gold); }
+.fbox { background: var(--tint); border-radius: 20px; padding: 22px; font-size: 31px; font-weight: 900; color: var(--ink); text-align: center; }
+.note { font-size: 24px; color: var(--muted); margin: 0; }
+.tag { align-self: flex-start; font-size: 18px; font-weight: 700; padding: 4px 16px; border-radius: 999px; }
+.tag.tb { background: var(--teal); color: #14112E; } .tag.eng { background: var(--coral-text); color: #fff; }
+.prob { background: var(--tint); border-radius: 18px; padding: 20px 26px; font-size: 28px; font-weight: 700; color: var(--ink); line-height: 1.5; }
+.stp { margin: 0; padding: 0; list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: 12px; }
+.stp li { counter-increment: s; position: relative; padding-left: 50px; font-size: 27px; line-height: 1.5; }
+.stp li::before { content: counter(s); position: absolute; left: 0; top: 4px; width: 36px; height: 36px; border-radius: 50%; background: var(--ink); color: #fff; font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.ans { background: var(--coral-text); color: #fff; border-radius: 16px; padding: 16px 26px; font-size: 32px; font-weight: 900; }
+.ans b { color: #fff; }
+.big { flex: 1; min-height: 0; margin-top: 16px; display: flex; }
+.cap { margin: 14px 0 0; background: #fff; border-radius: 14px; padding: 12px 22px; font-size: 25px; color: var(--ink); }
+.cmps { flex: 1; display: flex; gap: 32px; margin-top: 28px; align-items: center; }
+.cmp { flex: 1; border-radius: 24px; padding: 36px 40px; background: var(--tint); min-height: 380px; }
+.cmp.r { background: #fff; border: 3px solid var(--coral); }
+.cmp h3 { margin: 0 0 22px; font-size: 36px; color: var(--ink); } .cmp.r h3 { color: var(--coral-text); }
+.cmp ul { margin: 0; padding-left: 30px; display: flex; flex-direction: column; gap: 18px; font-size: 30px; line-height: 1.45; }
+.stats { flex: 1; display: flex; gap: 28px; align-items: center; margin-top: 24px; }
+.stat { flex: 1; background: var(--tint); border-radius: 24px; padding: 48px 28px; text-align: center; }
+.sv { font-size: 62px; font-weight: 900; color: var(--coral-text); line-height: 1.1; }
+.sl { font-size: 26px; margin-top: 16px; color: var(--ink); }
+.quiz { flex: 1; display: flex; flex-direction: column; gap: 18px; margin-top: 20px; }
+.qrow { flex: 1; display: flex; gap: 24px; align-items: center; background: #fff; border-radius: 18px; padding: 16px 28px; }
+.qn { flex: none; width: 58px; height: 58px; border-radius: 50%; background: var(--ink); color: #fff; font-weight: 900; font-size: 20px; display: flex; align-items: center; justify-content: center; }
+.qq { margin: 0; font-size: 29px; font-weight: 700; color: var(--ink); } .qa { margin: 8px 0 0; font-size: 28px; font-weight: 700; color: var(--coral-text); }
+
+/* 표지·소단원·정리(어두운 슬라이드) */
+.s-cover { padding: 0; }
+.s-cover .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.s-cover .fade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(27, 23, 64, .97) 0%, rgba(27, 23, 64, .88) 36%, rgba(27, 23, 64, 0) 66%); }
+.cover-txt { position: relative; padding: 110px 90px; max-width: 760px; }
+.num { font-size: 150px; font-weight: 900; color: var(--coral); line-height: 1; }
+.eyebrow { font-size: 24px; font-weight: 700; color: var(--gold); margin: 10px 0 6px; }
+.cover-txt h1, .sec-txt h1 { font-size: 66px; font-weight: 900; line-height: 1.18; margin: 0; }
+.sub { font-size: 26px; color: var(--on-dark); margin: 22px 0 0; }
+.course { font-size: 18px; color: var(--on-dark); margin-top: 70px; }
+.gen { position: absolute; right: 28px; bottom: 16px; font-size: 15px; color: var(--on-dark); margin: 0; }
+.s-section, .s-summary { justify-content: center; }
+.deco { position: absolute; border-radius: 50%; }
+.deco.a { width: 520px; height: 520px; right: 60px; top: 140px; background: var(--ink-2); }
+.deco.b { width: 230px; height: 230px; right: 140px; top: 560px; background: var(--coral); }
+.sec-txt { position: relative; max-width: 900px; }
+.sum-h { font-size: 56px; font-weight: 900; margin: 0 0 32px; }
+.sums { display: flex; gap: 24px; }
+.sum { flex: 1; background: var(--ink-2); border-radius: 22px; padding: 36px 32px; min-height: 300px; }
+.sum h3 { margin: 0 0 14px; color: var(--gold); font-size: 34px; }
+.sum p { margin: 0; font-size: 27px; line-height: 1.55; }
+.next { margin-top: 44px; font-size: 28px; font-weight: 700; color: #FF8A6E; }
+.s-metaphor { flex-direction: row; padding: 0; }
+.mimg { width: 46%; position: relative; }
+.mimg img { width: 100%; height: 100%; object-fit: cover; }
+.mimg figcaption { position: absolute; left: 16px; bottom: 14px; margin: 0; background: rgba(20, 17, 46, .72); color: #fff; padding: 4px 10px; border-radius: 6px; }
+.mtxt { flex: 1; padding: 80px 70px; display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+.mtxt h2 { margin: 0; font-size: 46px; font-weight: 900; color: var(--ink); line-height: 1.2; }
+.pill { align-self: flex-start; background: var(--gold); color: var(--ink); font-weight: 700; padding: 4px 18px; border-radius: 999px; font-size: 18px; }
+.s-intro { padding: 0; background: #14112E; }
+.bgv { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.vfade { position: absolute; left: 0; right: 0; bottom: 0; height: 300px; background: linear-gradient(180deg, rgba(20, 17, 46, 0), rgba(20, 17, 46, .9)); }
+.vcap { position: absolute; left: 80px; bottom: 70px; margin: 0; font-size: 40px; font-weight: 900; }
+.credits { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+.credits .tbl { font-size: 19px; }
+.credits .tbl td { text-align: left; }
+
+@media (prefers-reduced-motion: reduce) {
+  .anim, .frag, .bar, .reveal, .draw, #bar { transition: none !important; }
+}
+</style>
+</head>
+<body class="deck-page">
+<nav class="site-nav"><a class="brand" href="../index.html">확률과 통계</a><a class="nav-link" href="../index.html">강의 목록</a><a class="nav-link" href="../quiz.html">퀴즈</a><a class="nav-link" href="../playground.html">애니메이션 놀이터</a></nav>
+<main class="viewport" aria-label="2주차 슬라이드">
+<div class="stage" id="stage">
+<section class="slide s-cover dark" data-steps="0" aria-roledescription="slide"><img class="bg" src="../img/cover/w02_cover.jpg" alt=""><div class="fade"></div><div class="cover-txt"><div class="num anim" style="--d:0.10s">02</div><div class="eyebrow">2주차</div><h1>같은 것이 있는 순열과 중복조합</h1><p class="sub">구별되지 않는 것을 세는 방법</p><p class="course">확률과 통계 · 공과대학 1학년</p></div><p class="gen">이미지: Google Flow로 생성</p></section>
+<section class="slide s-goals" data-steps="0" aria-roledescription="slide"><header class="sh"><h2>학습목표</h2><span class="chip">2주차</span></header><div class="cards"><div class="goal anim up" style="--d:0.10s"><span class="gn">1</span><p>같은 것이 있는 순열의 수 계산</p></div><div class="goal anim up" style="--d:0.35s"><span class="gn">2</span><p>격자 도로망의 최단 경로 수 계산</p></div><div class="goal anim up" style="--d:0.60s"><span class="gn">3</span><p>중복조합의 뜻과 <sub>n</sub>H<sub>r</sub> = <sub>n+r−1</sub>C<sub>r</sub> 활용</p></div></div></section>
+<section class="slide s-section dark" data-steps="0" aria-roledescription="slide"><div class="deco a"></div><div class="deco b anim pop" style="--d:0.20s"></div><div class="sec-txt"><div class="eyebrow">2주차 · 같은 것이 있는 순열과 중복조합</div><h1>같은 것이 있는 순열</h1><p class="sub">겹치는 배열을 나누어 없애기</p></div></section>
+<section class="slide s-visual" data-steps="1" aria-roledescription="slide"><header class="sh"><h2>노란 공 3개와 파란 공 2개의 배열</h2><span class="chip">2주차</span></header><div class="big"><div class="vis"><figure class="img anim" style="--d:0.10s"><img src="../img/fig/w02_%EA%B3%B5%EB%B0%B0%EC%97%B410.png" alt="w02_공배열10.png" loading="lazy"></figure></div></div><p class="cap" class="frag" data-f="1">같은 색 공끼리는 구별 불가 → 서로 다른 배열은 10가지뿐</p></section>
+<section class="slide s-bullets" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>왜 5!이 아니라 10가지인가</h2><span class="chip">2주차</span></header><div class="two"><div class="col-t"><ul class="bl "><li class="frag" data-f="1">공에 번호를 붙이면 서로 다른 공 5개의 배열: 5! = 120</li><li class="frag" data-f="2">번호만 바꾼 배열은 같은 배열: 3! × 2! = 12가지씩 겹침</li><li class="frag" data-f="3">구하는 수를 k라 하면 k × 3! × 2! = 5!</li><li class="frag" data-f="4">k = 5!/(3! × 2!) = <b>10</b></li></ul></div><div class="col-v"><div class="vis"><figure class="img anim" style="--d:0.10s"><img src="../img/fig/w02_%EA%B5%AC%EB%B6%84%EA%B3%BC%EB%AC%B6%EC%9D%8C.png" alt="w02_구분과묶음.png" loading="lazy"></figure></div></div></div></section>
+<section class="slide s-concept" data-steps="2" aria-roledescription="slide"><header class="sh"><h2>같은 것이 있는 순열의 수</h2><span class="chip">2주차</span></header><div class="two"><div class="col-t"><div class="term" class="frag" data-f="1"><div class="term-h">같은 것이 있는 순열</div><p>n개 중 같은 것이 각각 p개, q개, …, r개씩 있을 때 n개를 모두 일렬로 배열하는 순열</p></div><div class="fbox" class="frag" data-f="2">n! / (p! × q! × … × r!)</div><p class="note" class="frag" data-f="2">단, p + q + … + r = n. 분모의 1!은 생략</p></div><div class="col-v"><div class="vis"><table class="tbl anim up" style="--d:0.10s"><thead><tr><th>상황</th><th>계산</th><th>결과</th></tr></thead><tbody><tr><td>노란 공 3, 파란 공 2</td><td>5!/(3!2!)</td><td>10</td></tr><tr><td>a, a, b, b, b</td><td>5!/(2!3!)</td><td>10</td></tr><tr><td>1, 1, 2, 2, 2, 3, 3</td><td>7!/(2!3!2!)</td><td>210</td></tr></tbody></table></div></div></div></section>
+<section class="slide s-example" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>숫자 카드 배열하기</h2><span class="chip">2주차</span></header><div class="two"><div class="col-t"><span class="tag tb">교과서 예제</span><div class="prob">일곱 개의 수 1, 1, 2, 2, 2, 3, 3을 모두 일렬로 배열하는 방법의 수</div><ol class="stp"><li class="frag" data-f="1">1이 2개, 2가 3개, 3이 2개인 같은 것이 있는 순열</li><li class="frag" data-f="2">전체 7개 → 분자 7! = 5040</li><li class="frag" data-f="3">분모 2! × 3! × 2! = 24</li></ol><div class="ans" class="frag" data-f="4">답 7!/(2! × 3! × 2!) = <b>210</b></div></div><div class="col-v"><div class="vis"><div class="slots"><div class="slotc anim up" style="--d:0.10s"><div class="slot"><span>1</span></div><div class="slotl">×2</div></div><div class="slotc anim up" style="--d:0.35s"><div class="slot"><span>2</span></div><div class="slotl">×3</div></div><div class="slotc anim up" style="--d:0.60s"><div class="slot"><span>3</span></div><div class="slotl">×2</div></div></div></div></div></div></section>
+<section class="slide s-example" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>ENGINEER의 문자 배열</h2><span class="chip">2주차</span></header><div class="two"><div class="col-t"><span class="tag eng">공학 예제</span><div class="prob">ENGINEER의 8개 문자를 모두 일렬로 배열할 때, 맨 앞에 E가 오는 방법의 수</div><ol class="stp"><li class="frag" data-f="1">맨 앞 E 고정 → 나머지 E, E, N, N, G, I, R 7개 배열</li><li class="frag" data-f="2">E가 2개, N이 2개인 같은 것이 있는 순열</li><li class="frag" data-f="3">참고: 제한 없는 전체 배열 8!/(3! × 2!) = 3360</li></ol><div class="ans" class="frag" data-f="4">답 7!/(2! × 2!) = <b>1260</b></div></div><div class="col-v"><div class="vis"><table class="tbl anim up" style="--d:0.10s"><thead><tr><th>문자</th><th>E</th><th>N</th><th>G</th><th>I</th><th>R</th></tr></thead><tbody><tr><td>전체 개수</td><td>3</td><td>2</td><td>1</td><td>1</td><td>1</td></tr><tr><td>E 고정 후</td><td>2</td><td>2</td><td>1</td><td>1</td><td>1</td></tr></tbody></table></div></div></div></section>
+<section class="slide s-stats" data-steps="3" aria-roledescription="slide"><header class="sh"><h2>비트열도 같은 것이 있는 순열</h2><span class="chip">2주차</span></header><div class="stats"><div class="stat anim up" style="--d:0.10s"><div class="sv">56</div><div class="sl">8비트 중 1이 3개: 8!/(3!5!)</div></div><div class="stat frag" data-f="1"><div class="sv">70</div><div class="sl">8비트 중 1이 4개: 8!/(4!4!)</div></div><div class="stat frag" data-f="2"><div class="sv">256</div><div class="sl">8비트 전체: 2<sup>8</sup></div></div></div><p class="cap" class="frag" data-f="3">0과 1은 각각 구별되지 않는 '같은 것' → 오류 검출 부호 설계의 기초</p></section>
+<section class="slide s-metaphor" data-steps="3" aria-roledescription="slide"><figure class="mimg"><img src="../img/web/w02_%EA%B2%A9%EC%9E%90%EB%8F%84%EC%8B%9C.jpg" alt="바둑판 도시의 최단 경로"><figcaption>사진: Alhzeiia / CC BY-SA 2.0 / Wikimedia Commons</figcaption></figure><div class="mtxt"><span class="pill">비유</span><h2>바둑판 도시의 최단 경로</h2><ul class="bl "><li class="frag" data-f="1">격자 도로에서 최단 경로 = 오른쪽(→)과 위쪽(↑)만으로 이동</li><li class="frag" data-f="2">경로 하나 = →와 ↑를 일렬로 늘어놓은 문자열</li><li class="frag" data-f="3">최단 경로의 수 = 같은 것이 있는 순열의 수</li></ul></div></section>
+<section class="slide s-example" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>학교에서 집까지 최단 경로</h2><span class="chip">2주차</span></header><div class="two"><div class="col-t"><span class="tag tb">교과서 예제</span><div class="prob">오른쪽 4칸, 위쪽 3칸 떨어진 집까지 도로망을 따라 최단 거리로 가는 방법의 수</div><ol class="stp"><li class="frag" data-f="1">오른쪽 한 칸 = a, 위쪽 한 칸 = b로 표시</li><li class="frag" data-f="2">최단 경로 = a 4개, b 3개의 일렬 배열</li><li class="frag" data-f="3">예: a a b a b b a</li></ol><div class="ans" class="frag" data-f="4">답 7!/(4! × 3!) = <b>35</b></div></div><div class="col-v"><div class="vis"><svg class="diagram" viewBox="0 0 620 480" role="img" aria-label="격자 최단경로"><line x1="50" y1="45" x2="50" y2="435" class="gridl"/><line x1="180" y1="45" x2="180" y2="435" class="gridl"/><line x1="310" y1="45" x2="310" y2="435" class="gridl"/><line x1="440" y1="45" x2="440" y2="435" class="gridl"/><line x1="570" y1="45" x2="570" y2="435" class="gridl"/><line x1="50" y1="45" x2="570" y2="45" class="gridl"/><line x1="50" y1="175" x2="570" y2="175" class="gridl"/><line x1="50" y1="305" x2="570" y2="305" class="gridl"/><line x1="50" y1="435" x2="570" y2="435" class="gridl"/><circle cx="50" cy="435" r="10" class="pt"/><text x="32" y="443" text-anchor="end" class="ptl">학교</text><circle cx="570" cy="45" r="10" class="pt"/><text x="588" y="53" class="ptl">집</text><line x1="50" y1="435" x2="180" y2="435" class="route draw" pathLength="1" style="--d:0.40s"/><line x1="180" y1="435" x2="310" y2="435" class="route draw" pathLength="1" style="--d:0.68s"/><line x1="310" y1="435" x2="310" y2="305" class="route draw" pathLength="1" style="--d:0.96s"/><line x1="310" y1="305" x2="440" y2="305" class="route draw" pathLength="1" style="--d:1.24s"/><line x1="440" y1="305" x2="440" y2="175" class="route draw" pathLength="1" style="--d:1.52s"/><line x1="440" y1="175" x2="440" y2="45" class="route draw" pathLength="1" style="--d:1.80s"/><line x1="440" y1="45" x2="570" y2="45" class="route draw" pathLength="1" style="--d:2.08s"/></svg></div></div></div></section>
+<section class="slide s-example" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>P 지점을 거쳐 가는 최단 경로</h2><span class="chip">2주차</span></header><div class="two"><div class="col-t"><span class="tag tb">교과서 예제</span><div class="prob">A에서 출발하여 P를 거쳐 B까지 최단 거리로 가는 방법의 수 (A→P: →2, ↑2 / P→B: →3, ↑2)</div><ol class="stp"><li class="frag" data-f="1">A → P: 4!/(2! × 2!) = 6</li><li class="frag" data-f="2">P → B: 5!/(3! × 2!) = 10</li><li class="frag" data-f="3">두 구간은 잇달아 일어남 → 곱의 법칙</li></ol><div class="ans" class="frag" data-f="4">답 6 × 10 = <b>60</b></div></div><div class="col-v"><div class="vis"><svg class="diagram" viewBox="0 0 620 480" role="img" aria-label="격자 최단경로"><line x1="60" y1="40" x2="60" y2="440" class="gridl"/><line x1="160" y1="40" x2="160" y2="440" class="gridl"/><line x1="260" y1="40" x2="260" y2="440" class="gridl"/><line x1="360" y1="40" x2="360" y2="440" class="gridl"/><line x1="460" y1="40" x2="460" y2="440" class="gridl"/><line x1="560" y1="40" x2="560" y2="440" class="gridl"/><line x1="60" y1="40" x2="560" y2="40" class="gridl"/><line x1="60" y1="140" x2="560" y2="140" class="gridl"/><line x1="60" y1="240" x2="560" y2="240" class="gridl"/><line x1="60" y1="340" x2="560" y2="340" class="gridl"/><line x1="60" y1="440" x2="560" y2="440" class="gridl"/><circle cx="60" cy="440" r="10" class="pt"/><text x="42" y="448" text-anchor="end" class="ptl">A</text><circle cx="560" cy="40" r="10" class="pt"/><text x="578" y="48" class="ptl">B</text><line x1="60" y1="440" x2="160" y2="440" class="route draw" pathLength="1" style="--d:0.40s"/><line x1="160" y1="440" x2="260" y2="440" class="route draw" pathLength="1" style="--d:0.68s"/><line x1="260" y1="440" x2="260" y2="340" class="route draw" pathLength="1" style="--d:0.96s"/><line x1="260" y1="340" x2="260" y2="240" class="route draw" pathLength="1" style="--d:1.24s"/><line x1="260" y1="240" x2="360" y2="240" class="route draw" pathLength="1" style="--d:1.52s"/><line x1="360" y1="240" x2="460" y2="240" class="route draw" pathLength="1" style="--d:1.80s"/><line x1="460" y1="240" x2="560" y2="240" class="route draw" pathLength="1" style="--d:2.08s"/><line x1="560" y1="240" x2="560" y2="140" class="route draw" pathLength="1" style="--d:2.36s"/><line x1="560" y1="140" x2="560" y2="40" class="route draw" pathLength="1" style="--d:2.64s"/></svg></div></div></div></section>
+<section class="slide s-example" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>물류 로봇의 최단 경로</h2><span class="chip">2주차</span></header><div class="two"><div class="col-t"><span class="tag eng">공학 예제</span><div class="prob">창고 격자에서 로봇이 오른쪽 6칸, 위쪽 4칸을 최단 거리로 이동하는 경로의 수</div><ol class="stp"><li class="frag" data-f="1">→ 6개, ↑ 4개의 일렬 배열</li><li class="frag" data-f="2">10!/(6! × 4!) = <sub>10</sub>C<sub>4</sub></li><li class="frag" data-f="3">경로 계획 알고리즘이 탐색해야 할 후보 수</li></ol><div class="ans" class="frag" data-f="4">답 <b>210</b>가지</div></div><div class="col-v"><div class="vis"><svg class="diagram" viewBox="0 0 620 480" role="img" aria-label="격자 최단경로"><line x1="50" y1="66.66666666666666" x2="50" y2="413.33333333333337" class="gridl"/><line x1="136.66666666666669" y1="66.66666666666666" x2="136.66666666666669" y2="413.33333333333337" class="gridl"/><line x1="223.33333333333334" y1="66.66666666666666" x2="223.33333333333334" y2="413.33333333333337" class="gridl"/><line x1="310" y1="66.66666666666666" x2="310" y2="413.33333333333337" class="gridl"/><line x1="396.6666666666667" y1="66.66666666666666" x2="396.6666666666667" y2="413.33333333333337" class="gridl"/><line x1="483.33333333333337" y1="66.66666666666666" x2="483.33333333333337" y2="413.33333333333337" class="gridl"/><line x1="570" y1="66.66666666666666" x2="570" y2="413.33333333333337" class="gridl"/><line x1="50" y1="66.66666666666666" x2="570" y2="66.66666666666666" class="gridl"/><line x1="50" y1="153.33333333333331" x2="570" y2="153.33333333333331" class="gridl"/><line x1="50" y1="240" x2="570" y2="240" class="gridl"/><line x1="50" y1="326.66666666666663" x2="570" y2="326.66666666666663" class="gridl"/><line x1="50" y1="413.33333333333337" x2="570" y2="413.33333333333337" class="gridl"/><circle cx="50" cy="413.33333333333337" r="10" class="pt"/><text x="32" y="421.33333333333337" text-anchor="end" class="ptl">출발</text><circle cx="570" cy="66.66666666666666" r="10" class="pt"/><text x="588" y="74.66666666666666" class="ptl">도착</text><line x1="50" y1="413.33333333333337" x2="136.66666666666669" y2="413.33333333333337" class="route draw" pathLength="1" style="--d:0.40s"/><line x1="136.66666666666669" y1="413.33333333333337" x2="223.33333333333334" y2="413.33333333333337" class="route draw" pathLength="1" style="--d:0.68s"/><line x1="223.33333333333334" y1="413.33333333333337" x2="310" y2="413.33333333333337" class="route draw" pathLength="1" style="--d:0.96s"/><line x1="310" y1="413.33333333333337" x2="310" y2="326.66666666666663" class="route draw" pathLength="1" style="--d:1.24s"/><line x1="310" y1="326.66666666666663" x2="310" y2="240" class="route draw" pathLength="1" style="--d:1.52s"/><line x1="310" y1="240" x2="396.6666666666667" y2="240" class="route draw" pathLength="1" style="--d:1.80s"/><line x1="396.6666666666667" y1="240" x2="483.33333333333337" y2="240" class="route draw" pathLength="1" style="--d:2.08s"/><line x1="483.33333333333337" y1="240" x2="570" y2="240" class="route draw" pathLength="1" style="--d:2.36s"/><line x1="570" y1="240" x2="570" y2="153.33333333333331" class="route draw" pathLength="1" style="--d:2.64s"/><line x1="570" y1="153.33333333333331" x2="570" y2="66.66666666666666" class="route draw" pathLength="1" style="--d:2.92s"/></svg></div></div></div></section>
+<section class="slide s-section dark" data-steps="0" aria-roledescription="slide"><div class="deco a"></div><div class="deco b anim pop" style="--d:0.20s"></div><div class="sec-txt"><div class="eyebrow">2주차 · 같은 것이 있는 순열과 중복조합</div><h1>중복조합</h1><p class="sub">중복을 허용하여 순서 없이 고르기</p></div></section>
+<section class="slide s-bullets" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>생각 열기: 우유 세 팩 고르기</h2><span class="chip">2주차</span></header><div class="two"><div class="col-t"><ul class="bl "><li class="frag" data-f="1">초코 우유, 딸기 우유 두 종류에서 세 팩 선택</li><li class="frag" data-f="2">같은 종류를 여러 번 선택 가능, 순서는 무관</li><li class="frag" data-f="3">가능한 선택: 초초초, 초초딸, 초딸딸, 딸딸딸</li><li class="frag" data-f="4">모두 <b>4가지</b> → 서로 다른 2개에서 중복 허용하여 3개 택하는 조합</li></ul></div><div class="col-v"><div class="vis"><table class="tbl anim up" style="--d:0.10s"><thead><tr><th>선택</th><th>초코</th><th>딸기</th></tr></thead><tbody><tr><td>①</td><td>3</td><td>0</td></tr><tr><td>②</td><td>2</td><td>1</td></tr><tr><td>③</td><td>1</td><td>2</td></tr><tr><td>④</td><td>0</td><td>3</td></tr></tbody></table></div></div></div></section>
+<section class="slide s-concept" data-steps="2" aria-roledescription="slide"><header class="sh"><h2>중복조합의 수</h2><span class="chip">2주차</span></header><div class="two"><div class="col-t"><div class="term" class="frag" data-f="1"><div class="term-h">중복조합 <sub>n</sub>H<sub>r</sub></div><p>서로 다른 n개에서 중복을 허용하여 r개를 택하는 조합 (H: homogeneous)</p></div><div class="fbox" class="frag" data-f="2"><sub>n</sub>H<sub>r</sub> = <sub>n+r−1</sub>C<sub>r</sub></div><p class="note" class="frag" data-f="2">공(○) r개와 칸막이(|) n−1개의 배열 수와 같은 값. r &gt; n도 가능</p></div><div class="col-v"><div class="vis"><figure class="img anim" style="--d:0.10s"><img src="../img/fig/w02_%EB%A7%89%EB%8C%80%EC%99%80%EA%B3%B5.png" alt="w02_막대와공.png" loading="lazy"></figure></div></div></div></section>
+<section class="slide s-compare" data-steps="1" aria-roledescription="slide"><header class="sh"><h2>중복순열 vs 중복조합</h2><span class="chip">2주차</span></header><div class="cmps"><div class="cmp l anim up" style="--d:0.10s"><h3>중복순열 <sub>n</sub>Π<sub>r</sub> = n<sup>r</sup></h3><ul><li>순서 구분 O</li><li>예: 3종 문자로 4자리 코드</li><li><sub>3</sub>Π<sub>4</sub> = 3<sup>4</sup> = 81</li><li>자리마다 n가지 선택</li></ul></div><div class="cmp r frag" data-f="1"><h3>중복조합 <sub>n</sub>H<sub>r</sub> = <sub>n+r−1</sub>C<sub>r</sub></h3><ul><li>순서 구분 X</li><li>예: 3종 부품 4개 주문</li><li><sub>3</sub>H<sub>4</sub> = <sub>6</sub>C<sub>4</sub> = 15</li><li>종류별 개수만 결정</li></ul></div></div></section>
+<section class="slide s-example" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>방정식의 정수해 개수</h2><span class="chip">2주차</span></header><div class="two"><div class="col-t"><span class="tag tb">교과서 예제</span><div class="prob">x + y + z = 7을 만족시키는 (1) 음이 아닌 정수해 (2) 양의 정수해의 개수</div><ol class="stp"><li class="frag" data-f="1">(1) x, y, z 중 중복 허용하여 7개 택하기: <sub>3</sub>H<sub>7</sub> = <sub>9</sub>C<sub>7</sub> = 36</li><li class="frag" data-f="2">(2) x = a+1, y = b+1, z = c+1로 놓으면 a + b + c = 4</li><li class="frag" data-f="3">a, b, c는 음이 아닌 정수 → <sub>3</sub>H<sub>4</sub> = <sub>6</sub>C<sub>4</sub> = 15</li></ol><div class="ans" class="frag" data-f="4">답 (1) <b>36</b>  (2) <b>15</b></div></div><div class="col-v"><div class="vis"><svg class="chart" viewBox="0 0 720 460" role="img" aria-label="x + y + z = n 의 음이 아닌 정수해 개수"><line x1="70" x2="700" y1="390" y2="390" class="gl"/><text x="60" y="396" class="tk" text-anchor="end">0</text><line x1="70" x2="700" y1="322" y2="322" class="gl"/><text x="60" y="328" class="tk" text-anchor="end">10</text><line x1="70" x2="700" y1="254" y2="254" class="gl"/><text x="60" y="260" class="tk" text-anchor="end">20</text><line x1="70" x2="700" y1="186" y2="186" class="gl"/><text x="60" y="192" class="tk" text-anchor="end">30</text><line x1="70" x2="700" y1="117.99999999999999" y2="117.99999999999999" class="gl"/><text x="60" y="123.99999999999999" class="tk" text-anchor="end">40</text><line x1="70" x2="700" y1="50" y2="50" class="gl"/><text x="60" y="56" class="tk" text-anchor="end">50</text><line x1="70" x2="700" y1="390" y2="390" class="ax"/><text x="385" y="452" class="at" text-anchor="middle">n</text><text transform="translate(18 220) rotate(-90)" class="at" text-anchor="middle">해의 개수</text><text x="360" y="26" class="ct" text-anchor="middle">x + y + z = n 의 음이 아닌 정수해 개수</text><rect class="bar" x="83.3" y="383.2" width="43.4" height="6.8" rx="3" style="--d:0.15s"/><text x="105" y="375.2" class="vl anim" text-anchor="middle" style="--d:0.60s">1</text><text x="105" y="416" class="tk" text-anchor="middle">0</text><rect class="bar" x="153.3" y="369.6" width="43.4" height="20.4" rx="3" style="--d:0.24s"/><text x="175" y="361.6" class="vl anim" text-anchor="middle" style="--d:0.69s">3</text><text x="175" y="416" class="tk" text-anchor="middle">1</text><rect class="bar" x="223.3" y="349.2" width="43.4" height="40.8" rx="3" style="--d:0.33s"/><text x="245" y="341.2" class="vl anim" text-anchor="middle" style="--d:0.78s">6</text><text x="245" y="416" class="tk" text-anchor="middle">2</text><rect class="bar" x="293.3" y="322" width="43.4" height="68" rx="3" style="--d:0.42s"/><text x="315" y="314" class="vl anim" text-anchor="middle" style="--d:0.87s">10</text><text x="315" y="416" class="tk" text-anchor="middle">3</text><rect class="bar" x="363.3" y="288" width="43.4" height="102" rx="3" style="--d:0.51s"/><text x="385" y="280" class="vl anim" text-anchor="middle" style="--d:0.96s">15</text><text x="385" y="416" class="tk" text-anchor="middle">4</text><rect class="bar" x="433.3" y="247.20000000000002" width="43.4" height="142.79999999999998" rx="3" style="--d:0.59s"/><text x="455" y="239.20000000000002" class="vl anim" text-anchor="middle" style="--d:1.04s">21</text><text x="455" y="416" class="tk" text-anchor="middle">5</text><rect class="bar" x="503.3" y="199.6" width="43.4" height="190.4" rx="3" style="--d:0.68s"/><text x="525" y="191.6" class="vl anim" text-anchor="middle" style="--d:1.13s">28</text><text x="525" y="416" class="tk" text-anchor="middle">6</text><rect class="bar hl" x="573.3" y="145.20000000000002" width="43.4" height="244.79999999999998" rx="3" style="--d:0.77s"/><text x="595" y="137.20000000000002" class="vl anim" text-anchor="middle" style="--d:1.22s">36</text><text x="595" y="416" class="tk" text-anchor="middle">7</text><rect class="bar" x="643.3" y="84" width="43.4" height="306" rx="3" style="--d:0.86s"/><text x="665" y="76" class="vl anim" text-anchor="middle" style="--d:1.31s">45</text><text x="665" y="416" class="tk" text-anchor="middle">8</text></svg></div></div></div></section>
+<section class="slide s-example" data-steps="5" aria-roledescription="slide"><header class="sh"><h2>서버 3대에 요청 나누기</h2><span class="chip">2주차</span></header><div class="two"><div class="col-t"><span class="tag eng">공학 예제</span><div class="prob">구별되지 않는 요청 10건을 서버 3대에 나눌 때, 각 서버가 최소 2건씩 처리하는 방법의 수</div><ol class="stp"><li class="frag" data-f="1">서버별 요청 수 x + y + z = 10 (x, y, z ≥ 2)</li><li class="frag" data-f="2">각 서버에 2건씩 먼저 배정 → 남은 4건 분배</li><li class="frag" data-f="3">a + b + c = 4의 음이 아닌 정수해 → <sub>3</sub>H<sub>4</sub></li><li class="frag" data-f="4">참고: 제한 없으면 <sub>3</sub>H<sub>10</sub> = <sub>12</sub>C<sub>10</sub> = 66</li></ol><div class="ans" class="frag" data-f="5">답 <sub>3</sub>H<sub>4</sub> = <sub>6</sub>C<sub>4</sub> = <b>15</b></div></div><div class="col-v"><div class="vis"><div class="slots"><div class="slotc anim up" style="--d:0.10s"><div class="slot"><span>2+a</span></div><div class="slotl">서버1</div></div><div class="op anim" style="--d:0.20s">+</div><div class="slotc anim up" style="--d:0.35s"><div class="slot"><span>2+b</span></div><div class="slotl">서버2</div></div><div class="op anim" style="--d:0.45s">+</div><div class="slotc anim up" style="--d:0.60s"><div class="slot"><span>2+c</span></div><div class="slotl">서버3</div></div></div></div></div></div></section>
+<section class="slide s-example" data-steps="4" aria-roledescription="slide"><header class="sh"><h2>탐구: 소화기 배치</h2><span class="chip">2주차</span></header><div class="two"><div class="col-t"><span class="tag tb">교과서 예제</span><div class="prob">일렬로 놓인 객실 10개 중 3곳의 문 앞에 소화기를 놓되, 어느 두 소화기도 이웃하지 않게 놓는 방법의 수</div><ol class="stp"><li class="frag" data-f="1">소화기 3대로 나뉜 네 구역 A, B, C, D의 객실 수: a + b + c + d = 7</li><li class="frag" data-f="2">이웃 금지 → 가운데 구역 b ≥ 1, c ≥ 1</li><li class="frag" data-f="3">b, c에 1개씩 먼저 배정 → a + b′ + c′ + d = 5</li></ol><div class="ans" class="frag" data-f="4">답 <sub>4</sub>H<sub>5</sub> = <sub>8</sub>C<sub>5</sub> = <b>56</b></div></div><div class="col-v"><div class="vis"><figure class="img anim" style="--d:0.10s"><img src="../img/fig/w02_%EC%86%8C%ED%99%94%EA%B8%B0.png" alt="w02_소화기.png" loading="lazy"></figure></div></div></div></section>
+<section class="slide s-quiz" data-steps="3" aria-roledescription="slide"><header class="sh"><h2>확인 퀴즈</h2><span class="chip">2주차</span></header><div class="quiz"><div class="qrow"><span class="qn">Q1</span><div><p class="qq">SUCCESS의 7개 문자를 모두 일렬로 배열하는 방법의 수</p><p class="qa" class="frag" data-f="1">→ 7!/(3! × 2!) = 420</p></div></div><div class="qrow"><span class="qn">Q2</span><div><p class="qq">저항 3종류 중에서 중복을 허용하여 5개를 고르는 방법의 수</p><p class="qa" class="frag" data-f="2">→ <sub>3</sub>H<sub>5</sub> = <sub>7</sub>C<sub>5</sub> = 21</p></div></div><div class="qrow"><span class="qn">Q3</span><div><p class="qq">x + y + z = 10의 양의 정수해 개수</p><p class="qa" class="frag" data-f="3">→ <sub>3</sub>H<sub>7</sub> = <sub>9</sub>C<sub>7</sub> = 36</p></div></div></div></section>
+<section class="slide s-summary dark" data-steps="1" aria-roledescription="slide"><h2 class="sum-h">2주차 정리</h2><div class="sums"><div class="sum anim up" style="--d:0.10s"><h3>같은 것이 있는 순열</h3><p>n! / (p! q! … r!)</p></div><div class="sum anim up" style="--d:0.30s"><h3>최단 경로</h3><p>→, ↑의 배열 = 같은 것이 있는 순열</p></div><div class="sum anim up" style="--d:0.50s"><h3>중복조합</h3><p><sub>n</sub>H<sub>r</sub> = <sub>n+r−1</sub>C<sub>r</sub>, 공과 칸막이</p></div><div class="sum anim up" style="--d:0.70s"><h3>정수해</h3><p>양의 정수 조건 → 먼저 1씩 배정 후 중복조합</p></div></div><p class="next" class="frag" data-f="1">다음 주: 이항정리와 파스칼의 삼각형</p></section>
+<section class="slide s-credits" data-steps="0"><header class="sh"><h2>이미지 출처</h2><span class="chip">2주차</span></header><div class="credits"><table class="tbl"><thead><tr><th>자료</th><th>작가</th><th>라이선스</th></tr></thead><tbody><tr><td>주차 표지 이미지</td><td>Google Flow로 생성</td><td>AI 생성</td></tr><tr><td>Eixample aire cropped</td><td>Alhzeiia</td><td>CC BY-SA 2.0</td></tr></tbody></table><p class="cap">사진: Wikimedia Commons의 자유 라이선스 이미지 · 그래프: 직접 계산해 그림</p></div></section>
+</div>
+</main>
+<div class="controls">
+<a class="cbtn" href="week01.html" title="이전 주차">«</a>
+<button class="cbtn" id="prevBtn" aria-label="이전">‹</button>
+<span id="counter" aria-live="polite">1 / 23</span>
+<button class="cbtn" id="nextBtn" aria-label="다음">›</button>
+<a class="cbtn" href="week03.html" title="다음 주차">»</a>
+<button class="cbtn" id="fsBtn" aria-label="전체 화면 (F)">⛶</button>
+</div>
+<div class="progress"><div id="bar"></div></div>
+<script>// 슬라이드 넘기기: ←/→/스페이스, 클릭, 스와이프, F(전체 화면), 주소 #번호
+(function () {
+  const stage = document.getElementById("stage");
+  const slides = Array.from(stage.querySelectorAll(".slide"));
+  const counter = document.getElementById("counter");
+  const bar = document.getElementById("bar");
+  const showAll = new URLSearchParams(location.search).has("all");
+  let cur = -1, step = 0;
+
+  function fit() {
+    const vp = stage.parentElement;
+    const s = Math.min(vp.clientWidth / 1600, vp.clientHeight / 900);
+    stage.style.transform = `translate(-50%, -50%) scale(${s})`;
+  }
+  const maxStep = (i) => +slides[i].dataset.steps || 0;
+  function paint() {
+    slides[cur].querySelectorAll(".frag").forEach((f) => f.classList.toggle("on", +f.dataset.f <= step));
+  }
+  function go(i, st) {
+    i = Math.max(0, Math.min(slides.length - 1, i));
+    if (i !== cur) {
+      if (cur >= 0) {
+        slides[cur].classList.remove("current", "active");
+        slides[cur].querySelectorAll("video").forEach((v) => v.pause());
+      }
+      cur = i;
+      const s = slides[cur];
+      s.classList.add("current");
+      // 표시된 다음 프레임에 active를 붙여야 등장 효과가 재생됨
+      requestAnimationFrame(() => requestAnimationFrame(() => s.classList.add("active")));
+      s.querySelectorAll("video").forEach((v) => { v.currentTime = 0; v.play().catch(() => {}); });
+      history.replaceState(null, "", `${location.search}#${cur + 1}`);
+    }
+    step = showAll ? maxStep(cur) : st;
+    paint();
+    counter.textContent = `${cur + 1} / ${slides.length}`;
+    bar.style.width = `${((cur + 1) / slides.length) * 100}%`;
+  }
+  const next = () => (step < maxStep(cur) ? go(cur, step + 1) : cur < slides.length - 1 && go(cur + 1, 0));
+  const prev = () => (step > 0 ? go(cur, step - 1) : cur > 0 && go(cur - 1, maxStep(cur - 1)));
+
+  document.addEventListener("keydown", (e) => {
+    if (e.altKey || e.ctrlKey || e.metaKey) return;
+    if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); next(); }
+    else if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); prev(); }
+    else if (e.key === "Home") go(0, 0);
+    else if (e.key === "End") go(slides.length - 1, maxStep(slides.length - 1));
+    else if (e.key === "f" || e.key === "F") toggleFs();
+  });
+  stage.addEventListener("click", (e) => {
+    if (e.target.closest("a, button, video")) return;
+    const r = stage.getBoundingClientRect();
+    (e.clientX - r.left < r.width * 0.25 ? prev : next)();
+  });
+  let tx = null;
+  stage.addEventListener("touchstart", (e) => (tx = e.touches[0].clientX), { passive: true });
+  stage.addEventListener("touchend", (e) => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 50) (dx < 0 ? next : prev)();
+    tx = null;
+  });
+  document.getElementById("nextBtn").onclick = next;
+  document.getElementById("prevBtn").onclick = prev;
+  function toggleFs() {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen?.().catch(() => document.body.classList.toggle("presenting"));
+  }
+  document.getElementById("fsBtn").onclick = toggleFs;
+  document.addEventListener("fullscreenchange", () => setTimeout(fit, 50));
+  window.addEventListener("resize", fit);
+  window.addEventListener("hashchange", () => {
+    const n = parseInt(location.hash.slice(1), 10);
+    if (n && n - 1 !== cur) go(n - 1, 0);
+  });
+  fit();
+  const start = parseInt(location.hash.slice(1), 10);
+  go(start ? start - 1 : 0, 0);
+})();
+</script>
+</body>
+</html>

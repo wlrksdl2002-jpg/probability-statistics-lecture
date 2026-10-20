@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>애니메이션 놀이터 · 확률과 통계</title>
+<meta name="description" content="Manim 스타일 문법으로 확률과 통계 개념을 애니메이션으로 만들어 보는 놀이터">
+<link rel="stylesheet" href="./assets/theme.css">
+<style>
+  .pg { display: grid; grid-template-columns: minmax(340px, 2fr) 3fr; grid-template-areas: "head head" "editor stage"; gap: 20px; padding: 20px; max-width: 1600px; margin: 0 auto; }
+  .pg-head { grid-area: head; }
+  .pg-head h1 { margin: 0 0 4px; font-size: 28px; color: var(--ink); }
+  .pg-head p { margin: 0; color: var(--muted); }
+  .editor { grid-area: editor; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .stage { grid-area: stage; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  canvas#stage { width: 100%; aspect-ratio: 16 / 9; height: auto; display: block; border-radius: var(--radius); background: #14112E; box-shadow: 0 4px 20px rgba(20, 17, 46, .25); }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .toolbar select { font: inherit; padding: 9px 12px; border-radius: 12px; border: 2px solid var(--tint); background: #fff; color: var(--text); max-width: 100%; }
+  .toolbar .grow { flex: 1; }
+  #status { color: var(--muted); font-size: 15px; min-height: 1.6em; }
+  textarea#code { font-family: var(--mono); font-size: 14px; line-height: 1.55; tab-size: 2; width: 100%; min-height: 560px; flex: 1; resize: vertical; padding: 16px; border-radius: var(--radius); border: 2px solid var(--tint); background: #1B1740; color: #EDEBFA; white-space: pre; overflow: auto; }
+  .hint { font-size: 14px; color: var(--muted); margin: 0; }
+  kbd { font-family: var(--mono); font-size: 12px; background: var(--tint); border-radius: 6px; padding: 1px 6px; color: var(--ink); }
+  .error { background: #FFF0EC; border: 2px solid var(--coral-text); color: #7A2414; border-radius: 14px; padding: 12px 16px; white-space: pre-wrap; font-size: 15px; }
+  .error b { color: var(--coral-text); }
+  details.cheats { background: #fff; border-radius: var(--radius); padding: 12px 18px; box-shadow: 0 2px 12px rgba(38, 33, 92, .08); }
+  details.cheats summary { cursor: pointer; font-weight: 700; color: var(--ink); }
+  .cheat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 20px; font-size: 14px; margin-top: 10px; }
+  .cheat-grid code { font-family: var(--mono); font-size: 13px; color: var(--coral-text); }
+  .cheat-grid h3 { grid-column: 1 / -1; margin: 10px 0 0; font-size: 15px; color: var(--ink); }
+  @media (max-width: 900px) {
+    .pg { grid-template-columns: 1fr; grid-template-areas: "head" "stage" "editor"; padding: 16px; }
+    textarea#code { min-height: 360px; }
+    .cheat-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<nav class="site-nav"><a class="brand" href="index.html">확률과 통계</a><a class="nav-link" href="index.html">강의 목록</a><a class="nav-link" href="quiz.html">퀴즈</a><a class="nav-link" href="playground.html" aria-current="page">애니메이션 놀이터</a></nav>
+
+<main class="pg">
+  <header class="pg-head">
+    <h1>애니메이션 놀이터</h1>
+    <p>Manim 스타일 문법으로 확률 개념을 움직여 보는 곳. 예제를 고르고 코드를 고친 뒤 실행해 보세요.</p>
+  </header>
+
+  <section class="stage" aria-label="애니메이션 화면">
+    <canvas id="stage" role="img" aria-label="코드로 만든 애니메이션이 재생되는 화면"></canvas>
+    <div class="toolbar">
+      <label for="preset" class="sr-only" style="position:absolute;left:-9999px">예제 선택</label>
+      <select id="preset" class="grow"></select>
+      <button class="btn accent" id="run" type="button">▶ 실행</button>
+      <button class="btn secondary" id="stop" type="button">■ 정지</button>
+      <button class="btn secondary" id="restart" type="button">↺ 처음부터</button>
+      <button class="btn secondary" id="record" type="button" title="실행 장면을 WebM 영상으로 저장">● 녹화</button>
+    </div>
+    <div id="status" role="status" aria-live="polite"></div>
+    <div id="error" class="error" role="alert" hidden></div>
+  </section>
+
+  <section class="editor" aria-label="코드 편집기">
+    <label for="code" style="font-weight:700;color:var(--ink)">코드</label>
+    <textarea id="code" spellcheck="false" autocapitalize="off" autocomplete="off" aria-describedby="code-hint"></textarea>
+    <p class="hint" id="code-hint"><kbd>Ctrl</kbd>+<kbd>Enter</kbd> 실행 · <kbd>Tab</kbd> 들여쓰기 · <kbd>Esc</kbd> 누른 뒤 <kbd>Tab</kbd>은 다음 칸으로 이동</p>
+    <details class="cheats">
+      <summary>문법 요약 보기</summary>
+      <div class="cheat-grid">
+        <h3>기본 틀</h3>
+        <div><code>async function construct(scene) { … }</code></div><div>이 함수 안에 장면을 작성</div>
+        <div><code>await scene.play(애니메이션, { runTime: 1 })</code></div><div>재생 (여러 개를 넣으면 동시에)</div>
+        <div><code>await scene.wait(0.5)</code></div><div>잠깐 멈춤</div>
+        <div><code>scene.add(도형) / scene.remove(도형)</code></div><div>바로 보이기·지우기</div>
+        <h3>도형</h3>
+        <div><code>Circle(r) · Square(s) · Rectangle(w, h) · Dot([x, y])</code></div><div>기본 도형 (옵션: color, fillOpacity)</div>
+        <div><code>Line(a, b) · Arrow(a, b) · DashedLine(a, b)</code></div><div>선과 화살표</div>
+        <div><code>Text("글자", { size: 0.5 }) · MathText("2^{5}")</code></div><div>글자와 첨자 (^{위}, _{아래})</div>
+        <div><code>VGroup(a, b).arrange(DOWN, 0.3)</code></div><div>묶어서 정렬</div>
+        <div><code>Axes({ xRange, yRange }) → axes.plot(f), axes.area(f, a, b)</code></div><div>그래프와 넓이</div>
+        <div><code>BarChart(values, { maxValue }) → chart.animate.setValues(v)</code></div><div>막대그래프</div>
+        <h3>애니메이션</h3>
+        <div><code>Create · Write · FadeIn(m, { shift }) · FadeOut</code></div><div>나타나기·사라지기</div>
+        <div><code>Transform(a, b) · ReplacementTransform(a, b)</code></div><div>모양 바꾸기</div>
+        <div><code>m.animate.shift(1, 0).rotate(PI / 4).scale(2)</code></div><div>변화 자체를 애니메이션으로</div>
+        <div><code>Rotate(m, angle, { about, upright }) · Indicate(m)</code></div><div>회전·강조</div>
+        <div><code>GrowFromCenter(m) · GrowFromEdge(m, DOWN)</code></div><div>자라나기</div>
+        <div><code>LaggedStart(...anims, { lagRatio: 0.2 })</code></div><div>조금씩 시차를 두고</div>
+        <h3>상수·도우미</h3>
+        <div><code>UP DOWN LEFT RIGHT · PI TAU</code></div><div>방향과 각도</div>
+        <div><code>CORAL TEAL GOLD BLUE WHITE GRAY …</code></div><div>색 이름</div>
+        <div><code>comb(n, r) · factorial(n) · normalPdf · normalCdf · binomPmf</code></div><div>확률 계산</div>
+        <div><code>random() · randint(a, b) · randn() · range(n) · round(x, 2)</code></div><div>난수(매 실행 같은 결과)·반복</div>
+      </div>
+    </details>
+  </section>
+</main>
+
+<script src="./assets/miniman.js"></script>
+<script src="./assets/miniman-presets.js"></script>
+<script>
+(function () {
+  const canvas = document.getElementById("stage");
+  const code = document.getElementById("code");
+  const preset = document.getElementById("preset");
+  const statusEl = document.getElementById("status");
+  const errorEl = document.getElementById("error");
+  const recordBtn = document.getElementById("record");
+  const scene = new Miniman.Scene(canvas);
+  const presets = window.MINIMAN_PRESETS || [];
+  const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let running = null;
+
+  presets.forEach((p, i) => { const o = document.createElement("option"); o.value = i; o.textContent = p.name; preset.appendChild(o); });
+
+  const STORE_KEY = "miniman-code-v1";
+  function load(i) {
+    code.value = presets[i] ? presets[i].code : "";
+  }
+
+  function setStatus(t) { statusEl.textContent = t; }
+  function showError(e) {
+    let msg = e && (e.friendly || e.message) || String(e);
+    msg = msg.replace(/^(\w+) is not defined$/, "'$1'라는 이름을 찾을 수 없음 (철자나 대소문자 확인)")
+             .replace(/^Cannot read propert(y|ies) of (undefined|null).*$/, "값이 없는 것(undefined)의 속성을 읽으려 함. 변수 이름이나 순서를 확인해 주세요");
+    let where = "";
+    const m = e && e.stack && e.stack.match(/<anonymous>:(\d+):(\d+)/);
+    if (m) where = `\n위치: 코드 ${Math.max(1, Number(m[1]) - 3)}번째 줄 근처`;
+    errorEl.innerHTML = "";
+    const b = document.createElement("b"); b.textContent = "실행 중 문제가 생겼어요: ";
+    errorEl.append(b, document.createTextNode(msg + where));
+    errorEl.hidden = false;
+  }
+
+  async function run() {
+    scene.abort();
+    if (running) { try { await running; } catch (e) {} }
+    scene.reset();
+    errorEl.hidden = true;
+    setStatus("재생 중…");
+    try { localStorage.setItem(STORE_KEY, JSON.stringify({ i: preset.value, code: code.value })); } catch (e) {}
+    const p = (async () => Miniman.runCode(scene, code.value))();
+    running = p;
+    try { await p; if (running === p) setStatus("완료. 코드를 바꿔서 다시 실행해 보세요."); }
+    catch (e) { if (e && e.isStop) { if (running === p) setStatus("정지됨"); } else { setStatus("오류"); showError(e); } }
+    finally { if (running === p) running = null; }
+  }
+  function stop() { scene.abort(); }
+
+  document.getElementById("run").addEventListener("click", run);
+  document.getElementById("restart").addEventListener("click", run);
+  document.getElementById("stop").addEventListener("click", stop);
+  preset.addEventListener("change", () => { load(preset.value); run(); });
+
+  // Tab 들여쓰기, Ctrl/Cmd+Enter 실행, Esc 다음 Tab은 포커스 이동
+  let escaped = false;
+  code.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); run(); return; }
+    if (e.key === "Escape") { escaped = true; return; }
+    if (e.key === "Tab" && !escaped && !e.shiftKey) {
+      e.preventDefault();
+      const s = code.selectionStart, en = code.selectionEnd;
+      code.setRangeText("  ", s, en, "end");
+      return;
+    }
+    escaped = false;
+  });
+
+  // 녹화: 캔버스를 WebM으로 저장
+  const canRecord = !!(canvas.captureStream && window.MediaRecorder);
+  if (!canRecord) { recordBtn.disabled = true; recordBtn.title = "이 브라우저는 녹화를 지원하지 않음"; }
+  recordBtn.addEventListener("click", async () => {
+    if (!canRecord) return;
+    const types = ["video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"];
+    const mimeType = types.find((t) => MediaRecorder.isTypeSupported(t));
+    const rec = new MediaRecorder(canvas.captureStream(60), mimeType ? { mimeType } : undefined);
+    const chunks = [];
+    rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+    rec.onstop = () => {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob(chunks, { type: "video/webm" }));
+      a.download = "animation.webm"; a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      setStatus("녹화 파일(animation.webm)을 저장했어요.");
+    };
+    recordBtn.disabled = true;
+    rec.start();
+    await run();
+    await new Promise((r) => setTimeout(r, 300));
+    rec.stop();
+    recordBtn.disabled = false;
+  });
+
+  window.addEventListener("resize", () => { if (scene.dpr !== (window.devicePixelRatio || 1)) scene.resize(); });
+
+  // 시작: 마지막으로 쓰던 코드가 있으면 불러오고, 움직임 줄이기 설정이 아니면 자동 재생
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null"); } catch (e) {}
+  if (saved && presets[saved.i]) { preset.value = saved.i; code.value = saved.code; } else load(0);
+  const start = () => { if (reduceMotion) { scene.render(); setStatus("▶ 실행 버튼을 누르면 재생됩니다."); } else run(); };
+  if (document.fonts && document.fonts.load) {
+    Promise.all(["500 32px \"Noto Sans KR\"", "700 32px \"Noto Sans KR\""].map((f) => document.fonts.load(f, "가A"))).catch(() => {}).then(start);
+  } else start();
+})();
+</script>
+</body>
+</html>

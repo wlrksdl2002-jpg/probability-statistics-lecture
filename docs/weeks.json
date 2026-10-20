@@ -1,0 +1,89 @@
+{
+  "course": {
+    "title": "확률과 통계",
+    "audience": "공과대학 1학년",
+    "tagline": "경우의 수부터 통계적 추정까지"
+  },
+  "weeks": [
+    {
+      "week": 1,
+      "title": "원순열과 중복순열",
+      "subtitle": "경우의 수 (1) · 교과서 p.10~15",
+      "slides": 30,
+      "file": "weeks/week01.html",
+      "cover": "img/cover/w01_cover.jpg"
+    },
+    {
+      "week": 2,
+      "title": "같은 것이 있는 순열과 중복조합",
+      "subtitle": "구별되지 않는 것을 세는 방법",
+      "slides": 23,
+      "file": "weeks/week02.html",
+      "cover": "img/cover/w02_cover.jpg"
+    },
+    {
+      "week": 3,
+      "title": "이항정리와 파스칼의 삼각형",
+      "subtitle": "(a + b)n의 계수는 조합의 수",
+      "slides": 22,
+      "file": "weeks/week03.html",
+      "cover": "img/cover/w03_cover.jpg"
+    },
+    {
+      "week": 4,
+      "title": "확률의 뜻과 덧셈정리",
+      "subtitle": "경우의 수에서 확률로",
+      "slides": 23,
+      "file": "weeks/week04.html",
+      "cover": "img/cover/w04_cover.jpg"
+    },
+    {
+      "week": 5,
+      "title": "조건부확률과 독립",
+      "subtitle": "조건이 붙으면 확률이 바뀜",
+      "slides": 23,
+      "file": "weeks/week05.html",
+      "cover": "img/cover/w05_cover.jpg"
+    },
+    {
+      "week": 6,
+      "title": "확률변수와 기댓값",
+      "subtitle": "불확실한 결과를 숫자로 요약",
+      "slides": 21,
+      "file": "weeks/week06.html",
+      "cover": "img/cover/w06_cover.jpg"
+    },
+    {
+      "week": 7,
+      "title": "이항분포",
+      "subtitle": "성공·실패를 n번 반복할 때의 분포",
+      "slides": 22,
+      "file": "weeks/week07.html",
+      "cover": "img/cover/w07_cover.jpg"
+    },
+    {
+      "week": 8,
+      "title": "연속확률변수와 정규분포",
+      "subtitle": "측정값이 종 모양으로 모이는 이유",
+      "slides": 22,
+      "file": "weeks/week08.html",
+      "cover": "img/cover/w08_cover.jpg"
+    },
+    {
+      "week": 9,
+      "title": "모집단과 표본, 표본평균의 분포",
+      "subtitle": "일부만 보고 전체를 아는 방법",
+      "slides": 21,
+      "file": "weeks/week09.html",
+      "cover": "img/cover/w09_cover.jpg"
+    },
+    {
+      "week": 10,
+      "title": "모평균의 추정과 10주 정리",
+      "subtitle": "표본으로 모평균의 범위를 말하는 방법",
+      "slides": 23,
+      "file": "weeks/week10.html",
+      "cover": "img/cover/w10_cover.jpg"
+    }
+  ]
+}

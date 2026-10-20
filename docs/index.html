@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>확률과 통계 웹 강의</title>
+<meta name="description" content="공과대학 1학년 확률과 통계 10주 강의 슬라이드, 퀴즈, 애니메이션 놀이터">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+  .hero { position: relative; min-height: 440px; display: flex; align-items: flex-end; color: #fff; background: var(--ink-deep); overflow: hidden; }
+  .hero video, .hero img.poster { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(27,23,64,.95) 0%, rgba(27,23,64,.75) 45%, rgba(27,23,64,.15) 100%); }
+  .hero-inner { position: relative; z-index: 1; padding: 48px 32px; max-width: 760px; }
+  .eyebrow { color: var(--gold); font-weight: 700; letter-spacing: .04em; margin: 0 0 8px; }
+  .hero h1 { font-size: clamp(40px, 7vw, 72px); line-height: 1.1; margin: 0 0 12px; font-weight: 900; }
+  .hero p.lead { color: var(--on-dark); font-size: 19px; margin: 0 0 24px; }
+  .hero .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .hero .btn.secondary { background: rgba(255,255,255,.14); color: #fff; }
+  .credit { position: absolute; right: 12px; bottom: 8px; z-index: 1; font-size: 12px; color: var(--on-dark); }
+
+  main { max-width: 1200px; margin: 0 auto; padding: 40px 20px 64px; }
+  h2.section { font-size: 28px; color: var(--ink); margin: 0 0 6px; }
+  p.section-sub { color: var(--muted); margin: 0 0 24px; }
+  .parts { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+  .part { font-size: 14px; font-weight: 700; padding: 4px 12px; border-radius: 999px; background: var(--tint); color: var(--ink); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+  .week { display: flex; flex-direction: column; text-decoration: none; color: inherit; background: #fff; border-radius: var(--radius); overflow: hidden; box-shadow: 0 2px 12px rgba(38,33,92,.08); transition: transform .2s ease, box-shadow .2s ease; }
+  .week:hover { transform: translateY(-4px); box-shadow: 0 10px 28px rgba(38,33,92,.16); }
+  .week img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; background: var(--ink-deep); }
+  .week .body { padding: 16px 18px 20px; }
+  .week .num { font-weight: 900; color: var(--coral-text); font-size: 14px; }
+  .week h3 { margin: 4px 0 6px; font-size: 19px; color: var(--ink); line-height: 1.35; }
+  .week p { margin: 0; color: var(--muted); font-size: 15px; }
+  .tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 48px; }
+  .tool { display: block; text-decoration: none; color: #fff; background: var(--ink); border-radius: var(--radius); padding: 28px; }
+  .tool.alt { background: var(--ink-2); }
+  .tool h3 { margin: 0 0 8px; font-size: 24px; }
+  .tool p { margin: 0; color: var(--on-dark); }
+  .tool .go { display: inline-block; margin-top: 16px; font-weight: 700; color: var(--gold); }
+  footer { text-align: center; color: var(--muted); font-size: 14px; padding: 24px 16px 40px; }
+  @media (prefers-reduced-motion: reduce) { .week { transition: none; } .week:hover { transform: none; } }
+</style>
+</head>
+<body>
+<nav class="site-nav">
+  <a class="brand" href="index.html">확률과 통계</a>
+  <a class="nav-link" href="index.html" aria-current="page">강의 목록</a>
+  <a class="nav-link" href="quiz.html">퀴즈</a>
+  <a class="nav-link" href="playground.html">애니메이션 놀이터</a>
+</nav>
+
+<header class="hero">
+  <img class="poster" src="img/thumbs/hero.jpg" alt="">
+  <video id="heroVideo" muted loop playsinline preload="metadata" poster="img/thumbs/hero.jpg" aria-hidden="true">
+    <source src="video/intro.mp4" type="video/mp4">
+  </video>
+  <div class="hero-inner">
+    <p class="eyebrow">공과대학 1학년 · 10주 강의</p>
+    <h1>확률과 통계</h1>
+    <p class="lead">경우의 수부터 통계적 추정까지. 슬라이드로 배우고, 퀴즈로 확인하고, 애니메이션으로 직접 실험하는 웹 강의</p>
+    <div class="actions">
+      <a class="btn accent" href="weeks/week01.html">1주차부터 시작</a>
+      <a class="btn secondary" href="quiz.html">퀴즈 풀기</a>
+      <a class="btn secondary" href="playground.html">애니메이션 놀이터</a>
+    </div>
+  </div>
+  <span class="credit">영상·표지 이미지: Google Flow로 생성</span>
+</header>
+
+<main>
+  <h2 class="section">주차별 강의 슬라이드</h2>
+  <p class="section-sub">카드를 누르면 슬라이드가 열림. 키보드 ← → 또는 화면 클릭으로 넘김, F 키로 전체 화면</p>
+  <div class="parts" aria-label="강의 구간">
+    <span class="part">1~3주 경우의 수</span><span class="part">4~5주 확률</span><span class="part">6~8주 확률분포</span><span class="part">9~10주 통계적 추정</span>
+  </div>
+  <div class="grid" id="weeks"></div>
+
+  <section class="tools" aria-label="학습 도구">
+    <a class="tool" href="quiz.html">
+      <h3>간단 퀴즈</h3>
+      <p>주차별 객관식 문제로 바로 채점. 틀린 문제는 풀이와 함께 다시 보기</p>
+      <span class="go">퀴즈 시작 →</span>
+    </a>
+    <a class="tool alt" href="playground.html">
+      <h3>Manim 스타일 애니메이션 놀이터</h3>
+      <p>코드를 고쳐 실행하면 바로 그려지는 애니메이션. 갈턴 보드, 큰수의 법칙, 중심극한정리 등 예제 포함</p>
+      <span class="go">놀이터 열기 →</span>
+    </a>
+  </section>
+</main>
+
+<footer>확률과 통계 웹 강의 · 사진 출처는 각 슬라이드와 마지막 출처 슬라이드에 표기</footer>
+
+<script>
+  const WEEKS = [
+    [1, "원순열과 중복순열", "경우의 수 (1) · 교과서 p.10~15"],
+    [2, "같은 것이 있는 순열과 중복조합", "구별되지 않는 것을 세는 방법"],
+    [3, "이항정리와 파스칼의 삼각형", "(a + b)ⁿ의 계수는 조합의 수"],
+    [4, "확률의 뜻과 덧셈정리", "경우의 수에서 확률로"],
+    [5, "조건부확률과 독립", "조건이 붙으면 확률이 바뀜"],
+    [6, "확률변수와 기댓값", "불확실한 결과를 숫자로 요약"],
+    [7, "이항분포", "성공·실패를 n번 반복할 때의 분포"],
+    [8, "연속확률변수와 정규분포", "측정값이 종 모양으로 모이는 이유"],
+    [9, "모집단과 표본, 표본평균의 분포", "일부만 보고 전체를 아는 방법"],
+    [10, "모평균의 추정과 10주 정리", "표본으로 모평균의 범위를 말하는 방법"],
+  ];
+  const grid = document.getElementById("weeks");
+  for (const [n, title, sub] of WEEKS) {
+    const nn = String(n).padStart(2, "0");
+    const a = document.createElement("a");
+    a.className = "week";
+    a.href = `weeks/week${nn}.html`;
+    a.innerHTML = `<img src="img/thumbs/w${nn}.jpg" alt="" loading="lazy"><div class="body"><span class="num">${n}주차</span><h3></h3><p></p></div>`;
+    a.querySelector("h3").textContent = title;
+    a.querySelector("p").textContent = sub;
+    grid.appendChild(a);
+  }
+  // 모션 줄이기 설정이 아니면 배경 영상 재생
+  const v = document.getElementById("heroVideo");
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) v.play().catch(() => {});
+</script>
+</body>
+</html>

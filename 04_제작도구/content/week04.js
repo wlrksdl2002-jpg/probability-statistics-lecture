@@ -13,7 +13,7 @@ module.exports = {
   title: "확률의 뜻과 덧셈정리",
   slides: [
     {
-      type: "cover",
+      type: "cover", bg: "w04_cover",
       title: "확률의 뜻과 덧셈정리",
       subtitle: "경우의 수에서 확률로",
       image: "w04_주사위",

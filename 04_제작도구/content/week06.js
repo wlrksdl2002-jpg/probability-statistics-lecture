@@ -4,7 +4,7 @@ module.exports = {
   title: "확률변수와 기댓값",
   slides: [
     {
-      type: "cover",
+      type: "cover", bg: "w06_cover",
       title: "확률변수와 기댓값",
       subtitle: "불확실한 결과를 숫자로 요약",
       image: "w06_주사위",

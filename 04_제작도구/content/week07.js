@@ -4,7 +4,7 @@ module.exports = {
   title: "이항분포",
   slides: [
     {
-      type: "cover",
+      type: "cover", bg: "w07_cover",
       title: "이항분포",
       subtitle: "성공·실패를 n번 반복할 때의 분포",
       image: "w07_검사",
