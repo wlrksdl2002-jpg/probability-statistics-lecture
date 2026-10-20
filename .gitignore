@@ -1,0 +1,13 @@
+# 설치 파일 (npm install 로 다시 받음)
+node_modules/
+__pycache__/
+
+# 교과서 원본: 저작권 자료라 저장소에 올리지 않음
+01_원자료/
+
+# 생성 결과물: node build.js 로 다시 만들 수 있음
+03_완성본/
+*.pptx
+
+# Claude Code 세션 파일
+.claude/
